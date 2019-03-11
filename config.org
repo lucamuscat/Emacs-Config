@@ -1,0 +1,342 @@
+#+TITLE: Luca Muscat's Emacs Config
+#+AUTHOR: Luca Muscat
+* Emacs Customization
+** Disable bell
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC
+** Line numbers
+#+BEGIN_SRC emacs-lisp
+(global-display-line-numbers-mode)
+#+END_SRC
+** Flyspell-lazy
+#+BEGIN_SRC emacs-lisp
+(require 'flyspell-lazy)
+(flyspell-lazy-mode 1)
+#+END_SRC
+** Flycheck fix
+#+BEGIN_SRC emacs-lisp
+(setq flycheck-check-syntax-automatically '(save mode-enable))
+;; the default value was '(save idle-change new-line mode-enabled)
+#+END_SRC
+** Clock
+#+BEGIN_SRC emacs-lisp
+(setq display-time-24hr-format t)
+(setq display-time-format "%d %B %Y - %H:%M")
+(display-time-mode 1)
+#+END_SRC
+** Beacon
+#+BEGIN_SRC 
+(use-package beacon
+ :ensure t
+ :config
+   (beacon-mode 1))
+#+END_SRC
+** Org Customizations
+*** Disable inline images
+#+BEGIN_SRC emacs-lisp
+(setq org-startup-with-inline-images nil)
+#+END_SRC
+
+*** Latex Image properties
+#+BEGIN_SRC emacs-lisp
+(setq org-latex-image-default-width "8cm")
+(setq org-latex-image-default-height "8cm")
+(setq org-latex-images-centered t)
+#+END_SRC
+*** Exporting to pdf
+#+BEGIN_SRC 
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+END_SRC
+
+*** Org Download
+#+BEGIN_SRC emacs-lisp
+(require 'org-download)
+;; Drag-and-drop to `dired`
+(add-hook 'dired-mode-hook 'org-download-enable)
+(setq-default org-download-heading-lvl nil)
+
+(add-hook 'org-mode-hook (lambda()
+(local-set-key (kbd "C-M-y") 'org-download-yank)
+(org-toggle-inline-images)
+))
+
+#+END_SRC
+*** Dark Room mode
+#+BEGIN_SRC emacs-lisp
+(require 'darkroom)
+(add-hook 'org-mode-hook (lambda ()
+(darkroom-tentative-mode)
+))
+
+#+END_SRC
+** TOC Options
+#+BEGIN_SRC emacs-lisp
+(setq org-latex-toc-command "\\tableofcontents \\clearpage")
+#+END_SRC
+** Yes/No -> y/n
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+** Send backups to backups directory
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+#+END_SRC
+
+** Remove Window Stuff
+#+BEGIN_SRC emacs-lisp
+(global-visual-line-mode 1)
+(menu-bar-mode -1)
+(toggle-scroll-bar -1) 
+(tool-bar-mode -1) 
+
+#+END_SRC
+** which-key
+#+BEGIN_SRC emacs-lisp
+(require 'which-key)
+(which-key-mode)
+#+END_SRC
+** Dashboard
+#+BEGIN_SRC emacs-lisp
+(require 'dashboard)
+(setq dashboard-startup-banner "C:/users/lucam/pictures/download.png")
+(setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
+(setq dashboard-items '((recents  . 3)
+                        (bookmarks . 3)
+                        (projects . 5)
+                        (agenda . 0)
+                        (registers . 0)))
+(dashboard-setup-startup-hook)
+#+END_SRC
+** Powerline (Mode line)
+#+BEGIN_SRC emacs-lisp
+(use-package powerline
+:ensure t
+:diminish
+:init (powerline-center-theme)
+)
+#+END_SRC
+
+** Clean up clutter from mode-line (Diminish)
+#+BEGIN_SRC 
+(use-package diminish
+ :ensure t
+ :init
+ (diminish 'which-key-mode)
+ (diminish 'beacon-mode))
+ (diminish 'projectile)
+#+END_SRC
+** Customize frame name
+#+BEGIN_SRC emacs-lisp
+(setq-default frame-title-format '("Lucinda?"))
+#+END_SRC
+
+** Customize font & font-size
+#+BEGIN_SRC emacs-lisp
+(set-frame-font "Consolas 12" nil t)
+#+END_SRC
+
+** Diff-hl mode
+Diff-hl mode shows where code was changes right beside the line numbers.
+#+BEGIN_SRC emacs-lisp
+(global-diff-hl-mode)
+;;(diff-hl-flydiff-mode)
+#+END_SRC
+
+** Disable splash screen
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-splash-screen t)
+#+END_SRC
+
+** UTF-8
+This is very important as sometimes you might encounter some different kinds of characters in the the package list which will start throwing annoying errors.
+
+#+BEGIN_SRC emacs-lisp
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+;; backwards compatibility as default-buffer-file-coding-system
+;; is deprecated in 23.2.
+(if (boundp 'buffer-file-coding-system)
+    (setq-default buffer-file-coding-system 'utf-8)
+  (setq default-buffer-file-coding-system 'utf-8))
+
+;; Treat clipboard input as UTF-8 string first; compound text next, etc.
+(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+#+END_SRC
+** Misc.
+#+BEGIN_SRC emacs-lisp 
+(rainbow-delimiters-mode)
+#+END_SRC
+
+* Programming
+**  Python Mode
+#+BEGIN_SRC emacs-lisp
+(require 'auto-virtualenvwrapper)
+(add-hook 'python-mode-hook
+	  (lambda ()
+	    (company-mode)
+	    (local-set-key (kbd "C-c C-<SPC>") 'company-jedi)	    
+	    (jedi:setup)
+	    (jedi:ac-setup)
+	    (flycheck-mode +1)
+	    (auto-virtualenvwrapper-activate)
+	    (setq python-indent-offset 4)
+	    (setq jedi:complete-on-dot t)                 ; optional
+	    (setq c-basic-indent 2)
+	    (setq tab-width 4)
+	    (setq indent-tabs-mode nil)
+	    ))
+(setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
+#+END_SRC
+**  Java Mode
+#+BEGIN_SRC emacs-lisp
+(defun create-java-project (project-name group-id)
+"Creates a java project with the necessary directory structure"
+(interactive "sProject Name:\nsGroup ID:")
+(shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
+)
+
+(add-hook 'java-mode-hook (lambda()
+(local-set-key (kbd "<f1>") 'jdee-debug)
+(local-set-key (kbd "<f2>") 'jdee-debug-set-breakpoint)
+(local-set-key (kbd "<f3>") 'jdee-debug-step-into)
+(local-set-key (kbd "<f4>") 'jdee-debug-cont)
+(local-set-key (kbd "<f6>") 'jdee-maven-build)
+))
+
+
+#+END_SRC
+** Yasnippet setup
+To create snippets, just write it out on any buffer and leave a '~' right behind the placeholder. Then highlight the region and use the command =aya-create=. Use =aya-persist-snippet= to save the created snippet. 
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+  :ensure t
+  :config
+  (use-package yasnippet-snippets :ensure t)
+  (yas-reload-all)
+  (yas-global-mode)
+  )
+  (use-package auto-yasnippet 
+  :ensure t		      
+  )
+#+END_SRC
+* Key Bindings
+**  Ace Window
+   =M-o= swaps window.
+   #+BEGIN_SRC emacs-lisp
+(use-package ace-window
+:bind("M-o" . ace-window)
+)
+   #+END_SRC
+**  Find file in project
+   =C-x= =C-M-f= to find a file in a project.
+   #+BEGIN_SRC emacs-lisp
+(use-package find-file-in-project
+:ensure t
+:diminish
+:bind("C-x C-M-f" . find-file-in-project)
+)
+   #+END_SRC
+**  Project Explorer
+   For project explorer hit =C-<tab>=
+   #+BEGIN_SRC emacs-lisp
+(use-package project-explorer
+:ensure t
+:diminish
+:bind("C-<tab>" . project-explorer-toggle)
+)
+   #+END_SRC
+** Multi Cursors
+   Multicursor down: =C->= Multicursor up : =C-<=
+   #+BEGIN_SRC emacs-lisp
+(use-package multiple-cursors
+:ensure t
+:diminish
+:defer t
+:bind
+("C->" . mc/mark-next-like-this)
+("C-<" . mc/mark-previous-like-this)
+)
+
+(use-package ace-mc
+:ensure t
+:diminish
+:bind
+("C-M->" . ace-mc-add-multiple-cursors)
+("C-M-<" . ace-mc-add-multiple-cursors)
+)
+
+#+END_SRC
+
+** Resizing Window
+=S-C-<left>=: shrink horizontally. =S-C-<right>=: enlarge horizontally. =S-C-<down>=: shrink vertically. =S-C-<up>=: enlarge vertically.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "S-C-<down>") 'shrink-window)
+(global-set-key (kbd "S-C-<up>") 'enlarge-window)
+#+END_SRC
+** Helm
+To search for code there are two options. There is either helm swoop (M-s, C-x a s to search all buffers) and helm occur(C-s). M-y for the kill ring, C-x r m is to traverse through bookmarks and C-x C-f to find files.
+#+BEGIN_SRC emacs-lisp
+
+(use-package helm		      
+:ensure t			      
+:diminish			      
+:defer t			      
+:init			      
+:bind			      
+("M-s" . helm-swoop)		      
+("C-x a s" . helm-multi-swoop-all) 
+("C-s" . helm-occur)		      
+("M-y" . helm-show-kill-ring)      
+("C-x C-f" . helm-find-files)      
+("C-x r m" . helm-bookmarks)	 
+("C-x C-b" . helm-buffers-list)  
+)				 
+  
+#+END_SRC
+** Ace Jump Mode
+C-x C-M-s to jump through text on the current screen.
+#+BEGIN_SRC emacs-lisp
+(use-package ace-jump-mode
+:ensure t
+:defer t
+:diminish
+:bind("C-x C-M-s" . ace-jump-mode)
+)
+#+END_SRC
+** Org Mode
+#+BEGIN_SRC emacs-lisp
+(setq-default org-download-image-dir "C:/users/lucam/pictures/orgimages/")
+
+(add-hook 'org-mode-hook (lambda()
+(local-set-key (kbd "C-s") 'helm-org-rifle)
+(local-set-key (kbd "M-s") 'helm-org-rifle-org-directory)
+(local-set-key (kbd "C-M-y") 'org-download-yank)
+(local-set-key (kbd "C-<return>") 'ispell-word)
+(local-set-key (kbd "C-M-q") 'anzu-replace-at-cursor-thing)
+))
+#+END_SRC
+** Misc.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-M-g") 'query-replace-regexp)
+(global-set-key (kbd "M-x") 'smex)
+
+(global-set-key (kbd "C-|") 'comment-box)
+(global-set-key (kbd "C-M-|") 'uncomment-region)
+#+END_SRC
+
+* ISpell Setup
+#+BEGIN_SRC emacs-lisp
+;; Spell Correct
+(setq ispell-program-name "c:/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
+;; "en_US" is key to lookup in `ispell-local-dictionary-alist`, please note it will be passed   to hunspell CLI as "-d" parameter
+(setq ispell-local-dictionary "en_US") 
+(setq ispell-local-dictionary-alist
+    '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+#+END_SRC

@@ -1,9 +1,14 @@
+(setq custom-safe-themes t)
+(load-theme 'spacemacs-dark)
+
 (setq ring-bell-function 'ignore)
 
 (global-display-line-numbers-mode)
 
-(require 'flyspell-lazy)
-(flyspell-lazy-mode 1)
+(use-package flyspell-lazy
+:ensure t
+:init (flyspell-lazy-mode 1)
+)
 
 (setq flycheck-check-syntax-automatically '(save mode-enable))
 ;; the default value was '(save idle-change new-line mode-enabled)
@@ -18,7 +23,9 @@
 (setq org-latex-image-default-height "8cm")
 (setq org-latex-images-centered t)
 
-(require 'org-download)
+(use-package org-download 
+:ensure t
+)
 ;; Drag-and-drop to `dired`
 (add-hook 'dired-mode-hook 'org-download-enable)
 (setq-default org-download-heading-lvl nil)
@@ -26,11 +33,6 @@
 (add-hook 'org-mode-hook (lambda()
 (local-set-key (kbd "C-M-y") 'org-download-yank)
 (org-toggle-inline-images)
-))
-
-(require 'darkroom)
-(add-hook 'org-mode-hook (lambda ()
-(darkroom-tentative-mode)
 ))
 
 (setq org-latex-toc-command "\\tableofcontents \\clearpage")

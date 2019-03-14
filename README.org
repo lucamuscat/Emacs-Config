@@ -1,0 +1,1 @@
+c:/Users/lucam/AppData/Roaming/.emacs.d/config.org

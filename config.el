@@ -1,21 +1,55 @@
-(setq custom-safe-themes t)
-(load-theme 'spacemacs-dark)
+(use-package spacemacs-theme
+  :defer t
+  :init (load-theme 'spacemacs-dark t))
+
+(setq inhibit-splash-screen t)
+
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+(menu-bar-mode -1)
+(toggle-scroll-bar -1) 
+(tool-bar-mode -1)
 
 (setq ring-bell-function 'ignore)
 
-(global-display-line-numbers-mode)
+(setq display-time-24hr-format t)
+(setq display-time-format "%d %B %Y - %H:%M")
+(display-time-mode 1)
+
+(use-package powerline
+:ensure t
+:diminish
+:init (powerline-center-theme)
+)
+
+(setq-default frame-title-format '("Lucinda?"))
+
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+(require 'dashboard)
+(setq dashboard-startup-banner "~/.emacs.d/download.png")
+(setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
+(setq dashboard-items '((recents  . 3)
+                        (bookmarks . 3)
+                        (projects . 5)
+                        (agenda . 0)
+                        (registers . 0)))
+(dashboard-setup-startup-hook)
+
+(global-visual-line-mode)
 
 (use-package flyspell-lazy
 :ensure t
 :init (flyspell-lazy-mode 1)
 )
 
-(setq flycheck-check-syntax-automatically '(save mode-enable))
-;; the default value was '(save idle-change new-line mode-enabled)
-
-(setq display-time-24hr-format t)
-(setq display-time-format "%d %B %Y - %H:%M")
-(display-time-mode 1)
+(use-package which-key 
+:ensure t
+:init (which-key-mode)
+)
 
 (setq org-startup-with-inline-images nil)
 
@@ -37,42 +71,15 @@
 
 (setq org-latex-toc-command "\\tableofcontents \\clearpage")
 
-(defalias 'yes-or-no-p 'y-or-n-p)
-
-(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
-
-(global-visual-line-mode 1)
-(menu-bar-mode -1)
-(toggle-scroll-bar -1) 
-(tool-bar-mode -1)
-
-(require 'which-key)
-(which-key-mode)
-
-(require 'dashboard)
-(setq dashboard-startup-banner "C:/users/lucam/pictures/download.png")
-(setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
-(setq dashboard-items '((recents  . 3)
-                        (bookmarks . 3)
-                        (projects . 5)
-                        (agenda . 0)
-                        (registers . 0)))
-(dashboard-setup-startup-hook)
-
-(use-package powerline
-:ensure t
-:diminish
-:init (powerline-center-theme)
+(use-package org-beautify-theme
+:config(add-hook 'org-mode-hook (lambda()
+(load-theme 'org-beautify t)
+))
 )
 
-(setq-default frame-title-format '("Lucinda?"))
-
-(set-frame-font "Consolas 12" nil t)
-
-(global-diff-hl-mode)
-;;(diff-hl-flydiff-mode)
-
-(setq inhibit-splash-screen t)
+(use-package diff-hl
+:config(add-hook 'prog-mode-hook 'diff-hl-mode)
+)
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
@@ -111,6 +118,8 @@
 (interactive "sProject Name:\nsGroup ID:")
 (shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
 )
+
+(setq jdee-server-dir "~/.emacs.d/jdee-jar")
 
 (add-hook 'java-mode-hook (lambda()
 (local-set-key (kbd "<f1>") 'jdee-debug)

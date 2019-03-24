@@ -1,129 +1,66 @@
 #+TITLE: My Emacs Config :)
 #+AUTHOR: Luca Muscat
-Hi there! As you might have guessed, this is my EMACS config which I use pretty often. There are some basic plugins in here which in my opinion everyone should be using. Hope that you could learn something by going through my config.
-
 [[./dashboard.JPG]]
-
+Hi there! As you might have guessed, this is my EMACS config which I use pretty often. There are some basic plugins in here which in my opinion everyone should be using. Hope that you could learn something by going through my config.
 * Installation
 ** Quick Installation
 =git clone https://github.com/lucamuscat/Emacs-Config/blob/master/config.org=
 
 Please keep in mind that your .emacs.d directory must be empty before cloning. Also this will download a good amount of packages, so don't panic, it won't take long. Thanks to literate programming this config is pretty self documenting but get into contact with me either way if you have any inquiries.
 
-
-
-* Emacs Customization
-** Load Theme
+* Theme
+My favourite theme by far has to be spacemacs-dark.
 #+BEGIN_SRC emacs-lisp
-(setq custom-safe-themes t)
-(load-theme 'spacemacs-dark)
+(use-package spacemacs-theme
+  :defer t
+  :init (load-theme 'spacemacs-dark t))
 #+END_SRC
-** Disable bell
+* Interface Settings
+These are built-in UI enhancements.
+** Looks 
+*** Removing startup screen
+This startup screen is replaced with the dashboard package. This package will offer much more valuable information whenever EMACS is opened for the first time.
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-splash-screen t)
+#+END_SRC
+
+*** Display Line Numbers
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+END_SRC
+
+*** Disable menus and scroll bars
+If you want any of these settings back, just change the -1 to a 1
+#+BEGIN_SRC emacs-lisp
+(menu-bar-mode -1)
+(toggle-scroll-bar -1) 
+(tool-bar-mode -1) 
+#+END_SRC
+
+*** Disable bell
+I find this feature annoying, feel free to remove this line if you like the sound of computerized bells
 #+BEGIN_SRC emacs-lisp
 (setq ring-bell-function 'ignore)
 #+END_SRC
-** Line numbers
-#+BEGIN_SRC emacs-lisp
-(global-display-line-numbers-mode)
-#+END_SRC
-** Flyspell-lazy
-#+BEGIN_SRC emacs-lisp
-(use-package flyspell-lazy
-:ensure t
-:init (flyspell-lazy-mode 1)
-)
-#+END_SRC
-** Flycheck fix
-#+BEGIN_SRC emacs-lisp
-(setq flycheck-check-syntax-automatically '(save mode-enable))
-;; the default value was '(save idle-change new-line mode-enabled)
-#+END_SRC
-** Clock
+
+*** Clock
+A clock which shows in the mode line.
 #+BEGIN_SRC emacs-lisp
 (setq display-time-24hr-format t)
 (setq display-time-format "%d %B %Y - %H:%M")
 (display-time-mode 1)
 #+END_SRC
-** Beacon
+*** Beacon
+This is a package which helps the user keep focus on which line they're on when they swap buffer. It temporarily highlights the line that the user is on.
 #+BEGIN_SRC 
 (use-package beacon
  :ensure t
  :config
    (beacon-mode 1))
 #+END_SRC
-** Org Customizations
-*** Disable inline images
-#+BEGIN_SRC emacs-lisp
-(setq org-startup-with-inline-images nil)
-#+END_SRC
 
-*** Latex Image properties
-#+BEGIN_SRC emacs-lisp
-(setq org-latex-image-default-width "8cm")
-(setq org-latex-image-default-height "8cm")
-(setq org-latex-images-centered t)
-#+END_SRC
-*** Exporting to pdf
-#+BEGIN_SRC 
-(setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-#+END_SRC
-
-*** Org Download
-#+BEGIN_SRC emacs-lisp
-(use-package org-download 
-:ensure t
-)
-;; Drag-and-drop to `dired`
-(add-hook 'dired-mode-hook 'org-download-enable)
-(setq-default org-download-heading-lvl nil)
-
-(add-hook 'org-mode-hook (lambda()
-(local-set-key (kbd "C-M-y") 'org-download-yank)
-(org-toggle-inline-images)
-))
-
-#+END_SRC
-** TOC Options
-#+BEGIN_SRC emacs-lisp
-(setq org-latex-toc-command "\\tableofcontents \\clearpage")
-#+END_SRC
-** Yes/No -> y/n
-#+BEGIN_SRC emacs-lisp
-(defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-
-** Send backups to backups directory
-#+BEGIN_SRC emacs-lisp
-(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
-#+END_SRC
-
-** Remove Window Stuff
-#+BEGIN_SRC emacs-lisp
-(global-visual-line-mode 1)
-(menu-bar-mode -1)
-(toggle-scroll-bar -1) 
-(tool-bar-mode -1) 
-
-#+END_SRC
-** which-key
-#+BEGIN_SRC emacs-lisp
-(require 'which-key)
-(which-key-mode)
-#+END_SRC
-** Dashboard
-#+BEGIN_SRC emacs-lisp
-(require 'dashboard)
-(setq dashboard-startup-banner "C:/users/lucam/pictures/download.png")
-(setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
-(setq dashboard-items '((recents  . 3)
-                        (bookmarks . 3)
-                        (projects . 5)
-                        (agenda . 0)
-                        (registers . 0)))
-(dashboard-setup-startup-hook)
-#+END_SRC
-** Powerline (Mode line)
+*** Powerline (Mode line)
+The "mode line" is the bar you see at the very bottom of your emacs window. This contains information relevant to the file that is currently being edited (for instance file name, minor and major modes used, current git branch and so on).
 #+BEGIN_SRC emacs-lisp
 (use-package powerline
 :ensure t
@@ -132,37 +69,32 @@ Please keep in mind that your .emacs.d directory must be empty before cloning. A
 )
 #+END_SRC
 
-** Clean up clutter from mode-line (Diminish)
-#+BEGIN_SRC 
-(use-package diminish
- :ensure t
- :init
- (diminish 'which-key-mode)
- (diminish 'beacon-mode))
- (diminish 'projectile)
-#+END_SRC
-** Customize frame name
+**** Clean up clutter from mode-line
+  #+BEGIN_SRC 
+  (use-package rich-minority
+  :ensure t
+  :init(rich-minority-mode 1)
+  )
+
+  #+END_SRC
+*** Customize frame name
+ #+BEGIN_SRC emacs-lisp
+ (setq-default frame-title-format '("Lucinda?"))
+ #+END_SRC
+
+*** Diff hl mode
+Diff-hl mode shows where code has been changed.
 #+BEGIN_SRC emacs-lisp
-(setq-default frame-title-format '("Lucinda?"))
+(use-package diff-hl
+:config(add-hook 'prog-mode-hook 'diff-hl-mode)
+)
 #+END_SRC
 
-** Customize font & font-size
+*** Customize font-family and font size
 #+BEGIN_SRC emacs-lisp
 (set-frame-font "Consolas 12" nil t)
 #+END_SRC
-
-** Diff-hl mode
-Diff-hl mode shows where code was changes right beside the line numbers.
-#+BEGIN_SRC emacs-lisp
-(global-diff-hl-mode)
-;;(diff-hl-flydiff-mode)
-#+END_SRC
-
-** Disable splash screen
-#+BEGIN_SRC emacs-lisp
-(setq inhibit-splash-screen t)
-#+END_SRC
-
+* Functionality
 ** UTF-8
 This is very important as sometimes you might encounter some different kinds of characters in the the package list which will start throwing annoying errors.
 #+BEGIN_SRC emacs-lisp
@@ -179,11 +111,116 @@ This is very important as sometimes you might encounter some different kinds of 
 ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 #+END_SRC
+** Backups
+Although backups are recommended, I don't like how they're implemented (it litters any directory you work in).
+#+BEGIN_SRC emacs-lisp
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+#+END_SRC
+** Change yes/no prompts to y/n
+Normally when the user is prompted to give a yes or no answer, they will have to type out the "yes" or "no" in its entirety. This option changed it to just a "y" for yes and a "n" no (I mean we're using EMACS, might as well save all the key strokes you can ;) )
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+** Dashboard
+This is what the user first encounters when they start up EMACS (an example of the dashboard can be seen in the screenshot above)
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+:ensure t
+:config(setq dashboard-startup-banner "~/.emacs.d/dashboard.png")
+(setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
+(setq dashboard-items '((recents  . 3)
+                        (bookmarks . 3)
+                        (projects . 5)
+                        (agenda . 0)
+                        (registers . 0)))
+(dashboard-setup-startup-hook)
+)
+#+END_SRC
+** Line wrapping
+#+BEGIN_SRC emacs-lisp
+(global-visual-line-mode)
+#+END_SRC
+** Flyspell-lazy
+I have found that using flyspell adds lag and input delay whenever a key stroke is pressed. This helps alleviate this issue by spell checking less often. Alternatively one may use flyspell buffer and check the buffer once a while whenever they deem it to be fit but this does the job automatically.
+#+BEGIN_SRC emacs-lisp
+(use-package flyspell-lazy
+:ensure t
+:init (flyspell-lazy-mode 1)
+)
+#+END_SRC
+
+** Which-key
+This is a god send for beginners and novices alike. In short, this allows the user to see what key bindings they can use on the fly.
+#+BEGIN_SRC emacs-lisp
+(use-package which-key 
+:ensure t
+:init (which-key-mode)
+)
+#+END_SRC
+
+** ISpell Setup
+In order for ISpell and flycheck to work, a recent version of hunspell needs to be used.
+#+BEGIN_SRC emacs-lisp
+;; Spell Correct
+(setq ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
+;; "en_US" is key to lookup in `ispell-local-dictionary-alist`, please note it will be passed   to hunspell CLI as "-d" parameter
+(setq ispell-local-dictionary "en_US") 
+(setq ispell-local-dictionary-alist
+    '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+#+END_SRC
+
+* Org Mode
+** Disable inline images
+#+BEGIN_SRC emacs-lisp
+(setq org-startup-with-inline-images nil)
+#+END_SRC
+
+** Latex Image properties
+#+BEGIN_SRC emacs-lisp
+(setq org-latex-image-default-width "8cm")
+(setq org-latex-image-default-height "8cm")
+(setq org-latex-images-centered t)
+#+END_SRC
+** Exporting to pdf
+#+BEGIN_SRC 
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+END_SRC
+
+** Org Download
+#+BEGIN_SRC emacs-lisp
+(use-package org-download 
+:ensure t
+)
+;; Drag-and-drop to `dired`
+(add-hook 'dired-mode-hook 'org-download-enable)
+(setq-default org-download-heading-lvl nil)
+
+(add-hook 'org-mode-hook (lambda()
+(local-set-key (kbd "C-M-y") 'org-download-yank)
+(org-toggle-inline-images)
+))
+
+#+END_SRC
+
+** Table of contents options
+#+BEGIN_SRC emacs-lisp
+(setq org-latex-toc-command "\\tableofcontents \\clearpage")
+#+END_SRC
+** Org beautify
+#+BEGIN_SRC emacs-lisp
+(use-package org-beautify-theme
+:config(add-hook 'org-mode-hook (lambda()
+(load-theme 'org-beautify t)
+))
+)
+#+END_SRC
 ** Misc.
 #+BEGIN_SRC emacs-lisp 
 (rainbow-delimiters-mode)
 #+END_SRC
-
 * Programming
 **  Python Mode
 #+BEGIN_SRC emacs-lisp
@@ -198,7 +235,7 @@ This is very important as sometimes you might encounter some different kinds of 
 	    (auto-virtualenvwrapper-activate)
 	    (setq python-indent-offset 4)
 	    (setq jedi:complete-on-dot t)                 ; optional
-	    (setq c-basic-indent 2)
+	    (setq c-basic-indent 4)
 	    (setq tab-width 4)
 	    (setq indent-tabs-mode nil)
 	    ))
@@ -211,6 +248,8 @@ This is very important as sometimes you might encounter some different kinds of 
 (interactive "sProject Name:\nsGroup ID:")
 (shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
 )
+
+(setq jdee-server-dir "~/.emacs.d/jdee-jar")
 
 (add-hook 'java-mode-hook (lambda()
 (local-set-key (kbd "<f1>") 'jdee-debug)
@@ -343,12 +382,3 @@ C-x C-M-s to jump through text on the current screen.
 (global-set-key (kbd "C-M-|") 'uncomment-region)
 #+END_SRC
 
-* ISpell Setup
-#+BEGIN_SRC emacs-lisp
-;; Spell Correct
-(setq ispell-program-name "c:/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
-;; "en_US" is key to lookup in `ispell-local-dictionary-alist`, please note it will be passed   to hunspell CLI as "-d" parameter
-(setq ispell-local-dictionary "en_US") 
-(setq ispell-local-dictionary-alist
-    '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
-#+END_SRC

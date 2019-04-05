@@ -6,7 +6,7 @@ Hi there! As you might have guessed, this is my EMACS config which I use pretty 
 ** Quick Installation
 =git clone https://github.com/lucamuscat/Emacs-Config/blob/master/config.org=
 
-Please keep in mind that your .emacs.d directory must be empty before cloning. Also this will download a good amount of packages, so don't panic, it won't take long. Thanks to literate programming this config is pretty self documenting but get into contact with me either way if you have any inquiries.
+Make sure that your .emacs.d directory is empty before cloning. A significant number of packages will be downloaded after the clone is done. Contact me with any inquiries which you might have.
 
 * Theme
 My favourite theme by far has to be spacemacs-dark.
@@ -19,7 +19,7 @@ My favourite theme by far has to be spacemacs-dark.
 These are built-in UI enhancements.
 ** Looks 
 *** Removing startup screen
-This startup screen is replaced with the dashboard package. This package will offer much more valuable information whenever EMACS is opened for the first time.
+The start up screen will be replaced with the dashboard package.
 #+BEGIN_SRC emacs-lisp
 (setq inhibit-splash-screen t)
 #+END_SRC
@@ -30,7 +30,7 @@ This startup screen is replaced with the dashboard package. This package will of
 #+END_SRC
 
 *** Disable menus and scroll bars
-If you want any of these settings back, just change the -1 to a 1
+Replace the -1 with a 1 keep these features.
 #+BEGIN_SRC emacs-lisp
 (menu-bar-mode -1)
 (toggle-scroll-bar -1) 
@@ -51,7 +51,7 @@ A clock which shows in the mode line.
 (display-time-mode 1)
 #+END_SRC
 *** Beacon
-This is a package which helps the user keep focus on which line they're on when they swap buffer. It temporarily highlights the line that the user is on.
+Helps user find the line which they are editing when they swap buffer.
 #+BEGIN_SRC 
 (use-package beacon
  :ensure t
@@ -60,7 +60,7 @@ This is a package which helps the user keep focus on which line they're on when 
 #+END_SRC
 
 *** Powerline (Mode line)
-The "mode line" is the bar you see at the very bottom of your emacs window. This contains information relevant to the file that is currently being edited (for instance file name, minor and major modes used, current git branch and so on).
+This is the bar at the very bottom of the emacs window. This contains information relevant to the file that is currently being edited (for instance file name, minor and major modes used, current git branch and so on).
 #+BEGIN_SRC emacs-lisp
 (use-package powerline
 :ensure t

@@ -1,6 +1,7 @@
 #+TITLE: My Emacs Config :)
 #+AUTHOR: Luca Muscat
-[[./dashboard.JPG]]
+[[./dashboard.png]]
+
 Hi there! As you might have guessed, this is my EMACS config which I use pretty often. There are some basic plugins in here which in my opinion everyone should be using. Hope that you could learn something by going through my config.
 * Installation
 ** Quick Installation

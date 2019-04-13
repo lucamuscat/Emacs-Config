@@ -24,13 +24,33 @@
 
 (setq-default frame-title-format '("Lucinda?"))
 
+(use-package diff-hl
+:config(add-hook 'prog-mode-hook 'diff-hl-mode)
+)
+
+(set-frame-font "Consolas 12" nil t)
+
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+;; backwards compatibility as default-buffer-file-coding-system
+;; is deprecated in 23.2.
+(if (boundp 'buffer-file-coding-system)
+    (setq-default buffer-file-coding-system 'utf-8)
+  (setq default-buffer-file-coding-system 'utf-8))
+
+;; Treat clipboard input as UTF-8 string first; compound text next, etc.
+(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(require 'dashboard)
-(setq dashboard-startup-banner "~/.emacs.d/download.png")
+(use-package dashboard
+:ensure t
+:config(setq dashboard-startup-banner "~/.emacs.d/dashboard.png")
 (setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
 (setq dashboard-items '((recents  . 3)
                         (bookmarks . 3)
@@ -38,6 +58,7 @@
                         (agenda . 0)
                         (registers . 0)))
 (dashboard-setup-startup-hook)
+)
 
 (global-visual-line-mode)
 
@@ -50,6 +71,13 @@
 :ensure t
 :init (which-key-mode)
 )
+
+;; Spell Correct
+(setq ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
+;; "en_US" is key to lookup in `ispell-local-dictionary-alist`, please note it will be passed   to hunspell CLI as "-d" parameter
+(setq ispell-local-dictionary "en_US") 
+(setq ispell-local-dictionary-alist
+    '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
 
 (setq org-startup-with-inline-images nil)
 
@@ -71,47 +99,31 @@
 
 (setq org-latex-toc-command "\\tableofcontents \\clearpage")
 
-(use-package org-beautify-theme
-:config(add-hook 'org-mode-hook (lambda()
-(load-theme 'org-beautify t)
-))
-)
-
-(use-package diff-hl
-:config(add-hook 'prog-mode-hook 'diff-hl-mode)
-)
-
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-;; backwards compatibility as default-buffer-file-coding-system
-;; is deprecated in 23.2.
-(if (boundp 'buffer-file-coding-system)
-    (setq-default buffer-file-coding-system 'utf-8)
-  (setq default-buffer-file-coding-system 'utf-8))
-
-;; Treat clipboard input as UTF-8 string first; compound text next, etc.
-(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
-
 (rainbow-delimiters-mode)
 
-(require 'auto-virtualenvwrapper)
-(add-hook 'python-mode-hook
-	  (lambda ()
-	    (company-mode)
-	    (local-set-key (kbd "C-c C-<SPC>") 'company-jedi)	    
-	    (jedi:setup)
-	    (jedi:ac-setup)
-	    (flycheck-mode +1)
-	    (auto-virtualenvwrapper-activate)
-	    (setq python-indent-offset 4)
-	    (setq jedi:complete-on-dot t)                 ; optional
-	    (setq c-basic-indent 2)
-	    (setq tab-width 4)
-	    (setq indent-tabs-mode nil)
-	    ))
-(setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
+(add-hook 'python-mode-hook 'yas-minor-mode)
+(add-hook 'python-mode-hook 'flycheck-mode)
+
+(with-eval-after-load 'company
+    (add-hook 'python-mode-hook 'company-mode))
+
+(use-package company-jedi
+  :ensure t
+  :config
+    (require 'company)
+    (add-to-list 'company-backends 'company-jedi))
+
+(defun python-mode-company-init ()
+  (setq-local company-backends '((company-jedi
+                                  company-etags
+                                  company-dabbrev-code))))
+
+(use-package company-jedi
+  :ensure t
+  :config
+    (require 'company)
+    (add-hook 'python-mode-hook 'python-mode-company-init))
+  (setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 
 (defun create-java-project (project-name group-id)
 "Creates a java project with the necessary directory structure"
@@ -215,10 +227,3 @@
 
 (global-set-key (kbd "C-|") 'comment-box)
 (global-set-key (kbd "C-M-|") 'uncomment-region)
-
-;; Spell Correct
-(setq ispell-program-name "c:/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
-;; "en_US" is key to lookup in `ispell-local-dictionary-alist`, please note it will be passed   to hunspell CLI as "-d" parameter
-(setq ispell-local-dictionary "en_US") 
-(setq ispell-local-dictionary-alist
-    '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))

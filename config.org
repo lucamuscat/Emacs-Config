@@ -210,37 +210,38 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 #+BEGIN_SRC emacs-lisp
 (setq org-latex-toc-command "\\tableofcontents \\clearpage")
 #+END_SRC
-** Org beautify
-#+BEGIN_SRC emacs-lisp
-(use-package org-beautify-theme
-:config(add-hook 'org-mode-hook (lambda()
-(load-theme 'org-beautify t)
-))
-)
-#+END_SRC
+
 ** Misc.
 #+BEGIN_SRC emacs-lisp 
 (rainbow-delimiters-mode)
 #+END_SRC
 * Programming
 **  Python Mode
+Taken from [[https://github.com/daedreth/UncleDavesEmacs%5D][Uncle Dave's Emacs Config]]
 #+BEGIN_SRC emacs-lisp
-(require 'auto-virtualenvwrapper)
-(add-hook 'python-mode-hook
-	  (lambda ()
-	    (company-mode)
-	    (local-set-key (kbd "C-c C-<SPC>") 'company-jedi)	    
-	    (jedi:setup)
-	    (jedi:ac-setup)
-	    (flycheck-mode +1)
-	    (auto-virtualenvwrapper-activate)
-	    (setq python-indent-offset 4)
-	    (setq jedi:complete-on-dot t)                 ; optional
-	    (setq c-basic-indent 4)
-	    (setq tab-width 4)
-	    (setq indent-tabs-mode nil)
-	    ))
-(setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
+(add-hook 'python-mode-hook 'yas-minor-mode)
+(add-hook 'python-mode-hook 'flycheck-mode)
+
+(with-eval-after-load 'company
+    (add-hook 'python-mode-hook 'company-mode))
+
+(use-package company-jedi
+  :ensure t
+  :config
+    (require 'company)
+    (add-to-list 'company-backends 'company-jedi))
+
+(defun python-mode-company-init ()
+  (setq-local company-backends '((company-jedi
+                                  company-etags
+                                  company-dabbrev-code))))
+
+(use-package company-jedi
+  :ensure t
+  :config
+    (require 'company)
+    (add-hook 'python-mode-hook 'python-mode-company-init))
+  (setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 #+END_SRC
 **  Java Mode
 #+BEGIN_SRC emacs-lisp

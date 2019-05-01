@@ -172,6 +172,35 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
     '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
 #+END_SRC
 
+** Dictionary
+#+BEGIN_SRC emacs-lisp
+(use-package define-word
+:ensure t
+:bind ("C-x C-M-d" . define-word-at-point)
+)
+#+END_SRC
+** helm-ag
+=helm-ag= is used to search all of the files in a project.
+#+BEGIN_SRC emacs-lisp
+(use-package helm-ag
+:ensure t
+:bind("C-M-s" . helm-ag)
+)
+#+END_SRC
+** anzu
+=anzu= will be used to replace words in on the cursor
+#+BEGIN_SRC emacs-lisp
+(use-package anzu
+:ensure t
+:bind("C-r" . anzu-query-replace-at-cursor)
+)
+#+END_SRC
+** Unbind certain keys CC 
+#+BEGIN_SRC emacs-lisp
+(global-unset-key "\C-z")
+(global-unset-key "\C-x\C-z")
+(global-unset-key "\C-x\C-c")
+#+END_SRC
 * Org Mode
 ** Disable inline images
 #+BEGIN_SRC emacs-lisp

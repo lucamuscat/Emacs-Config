@@ -1,5 +1,5 @@
 (use-package spacemacs-theme
-  :defer t
+:defer t
   :init (load-theme 'spacemacs-dark t))
 
 (setq inhibit-splash-screen t)
@@ -64,11 +64,13 @@
 
 (use-package flyspell-lazy
 :ensure t
+:defer t
 :init (flyspell-lazy-mode 1)
 )
 
 (use-package which-key 
 :ensure t
+:defer t
 :init (which-key-mode)
 )
 
@@ -78,6 +80,24 @@
 (setq ispell-local-dictionary "en_US") 
 (setq ispell-local-dictionary-alist
     '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+
+(use-package define-word
+:ensure t
+:bind ("C-x C-M-d" . define-word-at-point)
+)
+
+(use-package helm-ag
+:ensure t
+:bind("C-M-s" . helm-ag)
+)
+
+(use-package anzu
+:ensure t
+:bind("C-r" . anzu-query-replace-at-cursor)
+)
+
+(global-unset-key "\C-z")
+(global-unset-key "\C-x\C-z")
 
 (setq org-startup-with-inline-images nil)
 
@@ -98,8 +118,6 @@
 ))
 
 (setq org-latex-toc-command "\\tableofcontents \\clearpage")
-
-(rainbow-delimiters-mode)
 
 (add-hook 'python-mode-hook 'yas-minor-mode)
 (add-hook 'python-mode-hook 'flycheck-mode)
@@ -142,15 +160,20 @@
 ))
 
 (use-package yasnippet
-:ensure t
-:config
-(use-package yasnippet-snippets :ensure t)
-(yas-reload-all)
-(yas-global-mode)
+  :ensure t
+
+  :config
+  (use-package yasnippet-snippets 
+  :ensure t
+
 )
-(use-package auto-yasnippet 
-:ensure t		      
-)
+  (yas-reload-all)
+  (yas-global-mode)
+  )
+  (use-package auto-yasnippet 
+  :ensure t		      
+
+  )
 
 (use-package ace-window
 :bind("M-o" . ace-window)

@@ -13,7 +13,7 @@ Make sure that your .emacs.d directory is empty before cloning. A significant nu
 My favourite theme by far has to be spacemacs-dark.
 #+BEGIN_SRC emacs-lisp
 (use-package spacemacs-theme
-  :defer t
+:defer t
   :init (load-theme 'spacemacs-dark t))
 #+END_SRC
 * Interface Settings
@@ -95,6 +95,16 @@ Diff-hl mode shows where code has been changed.
 #+BEGIN_SRC emacs-lisp
 (set-frame-font "Consolas 12" nil t)
 #+END_SRC
+*** Speedbar
+Sr-Speedbar allows for speedbar (class navigator) to be docked in the same window.
+#+BEGIN_SRC emacs-lisp
+(require 'sr-speedbar)
+;; fix so speedbar is in same window
+(with-eval-after-load "speedbar"
+  (autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
+  (global-set-key (kbd "s-s") 'sr-speedbar-toggle)
+  )
+#+END_SRC
 * Functionality
 ** UTF-8
 This is very important as sometimes you might encounter some different kinds of characters in the the package list which will start throwing annoying errors.
@@ -148,6 +158,7 @@ I have found that using flyspell adds lag and input delay whenever a key stroke 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell-lazy
 :ensure t
+:defer t
 :init (flyspell-lazy-mode 1)
 )
 #+END_SRC
@@ -157,6 +168,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 #+BEGIN_SRC emacs-lisp
 (use-package which-key 
 :ensure t
+:defer t
 :init (which-key-mode)
 )
 #+END_SRC
@@ -195,7 +207,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 :bind("C-r" . anzu-query-replace-at-cursor)
 )
 #+END_SRC
-** Unbind certain keys CC 
+** Unbind certain keys
 #+BEGIN_SRC emacs-lisp
 (global-unset-key "\C-z")
 (global-unset-key "\C-x\C-z")
@@ -240,10 +252,6 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (setq org-latex-toc-command "\\tableofcontents \\clearpage")
 #+END_SRC
 
-** Misc.
-#+BEGIN_SRC emacs-lisp 
-(rainbow-delimiters-mode)
-#+END_SRC
 * Programming
 **  Python Mode
 Taken from [[https://github.com/daedreth/UncleDavesEmacs%5D][Uncle Dave's Emacs Config]]
@@ -297,13 +305,18 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
   :ensure t
+
   :config
-  (use-package yasnippet-snippets :ensure t)
+  (use-package yasnippet-snippets 
+  :ensure t
+
+)
   (yas-reload-all)
   (yas-global-mode)
   )
   (use-package auto-yasnippet 
   :ensure t		      
+
   )
 #+END_SRC
 * Key Bindings
@@ -323,15 +336,14 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 :bind("C-x C-M-f" . find-file-in-project)
 )
    #+END_SRC
-**  Project Explorer
-   For project explorer hit =C-<tab>=
-   #+BEGIN_SRC emacs-lisp
-(use-package project-explorer
-:ensure t
-:diminish
-:bind("C-<tab>" . project-explorer-toggle)
-)
-   #+END_SRC
+*** Speedbar
+Speed bar is a class navigator. =C-<tab>= will be used to toggle it.
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook (lambda ()
+(local-set-key (kbd "C-<tab>") 'sr-speedbar-toggle)
+))
+
+#+END_SRC
 ** Multi Cursors
    Multicursor down: =C->= Multicursor up : =C-<=
    #+BEGIN_SRC emacs-lisp

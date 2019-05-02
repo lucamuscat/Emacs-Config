@@ -446,6 +446,15 @@ To search for code there are two options. There is either helm swoop (M-s, C-x a
 )				 
   
 #+END_SRC
+** Ido
+#+BEGIN_SRC emacs-lisp
+(use-package ido
+    :diminish
+    :bind
+    ("C-x C-b" . ido-switch-buffer)
+    ("C-x C-f" . ido-find-file)
+)
+#+END_SRC
 ** Ace Jump Mode
 C-x C-M-s to jump through text on the current screen.
 #+BEGIN_SRC emacs-lisp

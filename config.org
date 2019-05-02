@@ -106,6 +106,46 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
   )
 #+END_SRC
 * Functionality
+** Git gutter
+#+BEGIN_SRC emacs-lisp
+(use-package git-gutter+
+:ensure t
+:diminish
+)
+
+(use-package git-gutter-fringe+
+:ensure t
+:diminish
+)
+
+(require 'git-gutter+)
+(require 'git-gutter-fringe+)
+(add-hook 'prog-mode-hook 'git-gutter+-mode)
+(add-hook 'org-mode-hook 'git-gutter+-mode)
+
+(eval-after-load 'git-gutter+
+'(progn
+	;;; Jump between hunks
+	(define-key git-gutter+-mode-map (kbd "C-x n") 'git-gutter+-next-hunk)
+	(define-key git-gutter+-mode-map (kbd "C-x p") 'git-gutter+-previous-hunk)
+
+	;;; Act on hunks
+	(define-key git-gutter+-mode-map (kbd "C-x v =") 'git-gutter+-show-hunk)
+	(define-key git-gutter+-mode-map (kbd "C-x r") 'git-gutter+-revert-hunks)
+	;; Stage hunk at point.
+	;; If region is active, stage all hunk lines within the region.
+	(define-key git-gutter+-mode-map (kbd "C-x t") 'git-gutter+-stage-hunks)
+	(define-key git-gutter+-mode-map (kbd "C-x c") 'git-gutter+-commit)
+	(define-key git-gutter+-mode-map (kbd "C-x C") 'git-gutter+-stage-and-commit)
+	(define-key git-gutter+-mode-map (kbd "C-x C-y") 'git-gutter+-stage-and-commit-whole-buffer)
+	(define-key git-gutter+-mode-map (kbd "C-x U") 'git-gutter+-unstage-whole-buffer))
+	)
+	
+#+END_SRC
+** IDO
+#+BEGIN_SRC emacs-lisp
+(ido-mode 1)
+#+END_SRC
 ** UTF-8
 This is very important as sometimes you might encounter some different kinds of characters in the the package list which will start throwing annoying errors.
 #+BEGIN_SRC emacs-lisp

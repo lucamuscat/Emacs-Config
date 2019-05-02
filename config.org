@@ -398,8 +398,9 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 :diminish
 :bind("C-x C-M-f" . find-file-in-project)
 )
-   #+END_SRC
-*** Speedbar
+#+END_SRC
+** Speedbar
+
 Speed bar is a class navigator. =C-<tab>= will be used to toggle it.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook (lambda ()

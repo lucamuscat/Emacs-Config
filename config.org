@@ -52,6 +52,7 @@ A clock which shows in the mode line.
 (display-time-mode 1)
 #+END_SRC
 *** Beacon
+
 Helps user find the line which they are editing when they swap buffer.
 #+BEGIN_SRC 
 (use-package beacon
@@ -383,22 +384,24 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 ))
 #+END_SRC
 * Key Bindings
-**  Ace Window
-   =M-o= swaps window.
+** Ace Window
+=M-o= swaps window.
    #+BEGIN_SRC emacs-lisp
 (use-package ace-window
 :bind("M-o" . ace-window)
 )
    #+END_SRC
-**  Find file in project
-   =C-x= =C-M-f= to find a file in a project.
-   #+BEGIN_SRC emacs-lisp
+** Find file in project
+
+=C-x= =C-M-f= to find a file in a project.
+#+BEGIN_SRC emacs-lisp
 (use-package find-file-in-project
 :ensure t
 :diminish
 :bind("C-x C-M-f" . find-file-in-project)
 )
 #+END_SRC
+
 ** Speedbar
 
 Speed bar is a class navigator. =C-<tab>= will be used to toggle it.
@@ -406,7 +409,6 @@ Speed bar is a class navigator. =C-<tab>= will be used to toggle it.
 (add-hook 'prog-mode-hook (lambda ()
 (local-set-key (kbd "C-<tab>") 'sr-speedbar-toggle)
 ))
-
 #+END_SRC
 ** Multi Cursors
    Multicursor down: =C->= Multicursor up : =C-<=
@@ -445,16 +447,14 @@ To search for code there are two options. There is either helm swoop (M-s, C-x a
 (use-package helm		      
 :ensure t			      
 :diminish			      
-:defer t			      
 :init			      
 :bind			      
 ("M-s" . helm-swoop)		      
 ("C-x a s" . helm-multi-swoop-all) 
 ("C-s" . helm-occur)		      
 ("M-y" . helm-show-kill-ring)      
-("C-x C-f" . helm-find-files)      
 ("C-x r m" . helm-bookmarks)	 
-("C-x C-b" . helm-buffers-list)  
+
 )				 
   
 #+END_SRC

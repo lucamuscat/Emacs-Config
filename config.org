@@ -369,7 +369,18 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 (setq company-tooltip-align-annotations 't)          ; align annotations to the right tooltip border
 (setq company-idle-delay .3)                         ; decrease delay before autocompletion popup shows
 (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
-(global-set-key (kbd "C-c /") 'company-files)        ; Force complete file names on "C-c /" key
+
+(add-hook 'web-mode-hook (lambda ()
+                          (set (make-local-variable 'company-backends) '(company-web-html))
+                          (company-mode t)))
+
+#+END_SRC
+** Smart Compile
+#+BEGIN_SRC emacs-lisp
+(require 'smart-compile)
+(add-hook 'prog-mode-hook (lambda()
+(local-set-key (kbd "C-c C-c") 'smart-compile)
+))
 #+END_SRC
 * Key Bindings
 **  Ace Window

@@ -294,29 +294,41 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 **  Python Mode
 Taken from [[https://github.com/daedreth/UncleDavesEmacs%5D][Uncle Dave's Emacs Config]]
 #+BEGIN_SRC emacs-lisp
-(add-hook 'python-mode-hook 'yas-minor-mode)
-(add-hook 'python-mode-hook 'flycheck-mode)
+(defun python-init()
+"Python-mode-hook"
+(yas-minor-mode)
+(flycheck-mode)
+(pipenv-mode)
+(pipenv-activate)
+(eglot)
+(company-mode)
+)
 
-(with-eval-after-load 'company
-    (add-hook 'python-mode-hook 'company-mode))
+(add-hook 'python-mode-hook 'python-init)
 
-(use-package company-jedi
-  :ensure t
-  :config
-    (require 'company)
-    (add-to-list 'company-backends 'company-jedi))
+(defun python-save-hook()
+  "Test of save hook"
+  (when (eq major-mode 'python-mode)
+      (pylint)
+      (blacken-buffer)
+    ))
 
-(defun python-mode-company-init ()
-  (setq-local company-backends '((company-jedi
-                                  company-etags
-                                  company-dabbrev-code))))
+(add-hook 'after-save-hook 'python-save-hook)
+;; From https://github.com/valignatev/dotfiles/blob/literate-config/.emacs.d/config.org
+(use-package company
+  :custom
+  (company-require-match nil)
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 1)
+  (company-tooltip-align-annotation t)
+  (company-frontends '(company-pseudo-tooltip-frontend
+		       company-echo-metadata-frontend))
+  :hook ((prog-mode . company-mode))
+  :bind (:map company-active-map
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous)))
 
-(use-package company-jedi
-  :ensure t
-  :config
-    (require 'company)
-    (add-hook 'python-mode-hook 'python-mode-company-init))
-  (setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
+(setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 #+END_SRC
 **  Java Mode
 #+BEGIN_SRC emacs-lisp

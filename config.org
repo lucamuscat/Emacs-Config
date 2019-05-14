@@ -126,22 +126,22 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 
 (eval-after-load 'git-gutter+
 '(progn
-	;;; Jump between hunks
-	(define-key git-gutter+-mode-map (kbd "C-x n") 'git-gutter+-next-hunk)
-	(define-key git-gutter+-mode-map (kbd "C-x p") 'git-gutter+-previous-hunk)
+;;; Jump between hunks
+(define-key git-gutter+-mode-map (kbd "C-x n") 'git-gutter+-next-hunk)
+(define-key git-gutter+-mode-map (kbd "C-x p") 'git-gutter+-previous-hunk)
 
-	;;; Act on hunks
-	(define-key git-gutter+-mode-map (kbd "C-x v =") 'git-gutter+-show-hunk)
+;;; Act on hunks
+(define-key git-gutter+-mode-map (kbd "C-x v =") 'git-gutter+-show-hunk)
 
-	;; Stage hunk at point.
-	;; If region is active, stage all hunk lines within the region.
-	(define-key git-gutter+-mode-map (kbd "C-x t") 'git-gutter+-stage-hunks)
-	(define-key git-gutter+-mode-map (kbd "C-x c") 'git-gutter+-commit)
-	(define-key git-gutter+-mode-map (kbd "C-x C") 'git-gutter+-stage-and-commit)
-	(define-key git-gutter+-mode-map (kbd "C-x C-y") 'git-gutter+-stage-and-commit-whole-buffer)
-	(define-key git-gutter+-mode-map (kbd "C-x U") 'git-gutter+-unstage-whole-buffer))
-	)
-	
+;; Stage hunk at point.
+;; If region is active, stage all hunk lines within the region.
+(define-key git-gutter+-mode-map (kbd "C-x t") 'git-gutter+-stage-hunks)
+(define-key git-gutter+-mode-map (kbd "C-x c") 'git-gutter+-commit)
+(define-key git-gutter+-mode-map (kbd "C-x C") 'git-gutter+-stage-and-commit)
+(define-key git-gutter+-mode-map (kbd "C-x C-y") 'git-gutter+-stage-and-commit-whole-buffer)
+(define-key git-gutter+-mode-map (kbd "C-x U") 'git-gutter+-unstage-whole-buffer))
+)
+
 #+END_SRC
 ** IDO
 #+BEGIN_SRC emacs-lisp
@@ -199,7 +199,6 @@ I have found that using flyspell adds lag and input delay whenever a key stroke 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell-lazy
 :ensure t
-:defer t
 :init (flyspell-lazy-mode 1)
 )
 #+END_SRC
@@ -207,9 +206,8 @@ I have found that using flyspell adds lag and input delay whenever a key stroke 
 ** Which-key
 This is a god send for beginners and novices alike. In short, this allows the user to see what key bindings they can use on the fly.
 #+BEGIN_SRC emacs-lisp
-(use-package which-key 
+(use-package which-key
 :ensure t
-:defer t
 :init (which-key-mode)
 )
 #+END_SRC
@@ -220,7 +218,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 ;; Spell Correct
 (setq ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
 ;; "en_US" is key to lookup in `ispell-local-dictionary-alist`, please note it will be passed   to hunspell CLI as "-d" parameter
-(setq ispell-local-dictionary "en_US") 
+(setq ispell-local-dictionary "en_US")
 (setq ispell-local-dictionary-alist
     '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
 #+END_SRC

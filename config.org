@@ -474,7 +474,7 @@ C-x C-M-s to jump through text on the current screen.
 :ensure t
 :defer t
 :diminish
-:bind("C-x C-M-s" . ace-jump-mode)
+:bind("C-z" . ace-jump-mode)
 )
 #+END_SRC
 ** Org Mode

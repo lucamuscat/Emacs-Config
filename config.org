@@ -102,7 +102,6 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 ;; fix so speedbar is in same window
 (with-eval-after-load "speedbar"
   (autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
-  (global-set-key (kbd "s-s") 'sr-speedbar-toggle)
   )
 #+END_SRC
 * Functionality

@@ -407,7 +407,7 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 Speed bar is a class navigator. =C-<tab>= will be used to toggle it.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook (lambda ()
-(local-set-key (kbd "C-<tab>") 'sr-speedbar-toggle)
+(local-set-key (kbd "C-<tab>") 'neotree-toggle)
 ))
 #+END_SRC
 ** Multi Cursors

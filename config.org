@@ -297,7 +297,7 @@ Taken from [[https://github.com/daedreth/UncleDavesEmacs%5D][Uncle Dave's Emacs 
 "Python-mode-hook"
 (yas-minor-mode)
 (flycheck-mode)
-(pipenv-mode)
+(pipenv-mode 1)
 (pipenv-activate)
 (eglot)
 (company-mode)
@@ -309,7 +309,7 @@ Taken from [[https://github.com/daedreth/UncleDavesEmacs%5D][Uncle Dave's Emacs 
   "Test of save hook"
   (when (eq major-mode 'python-mode)
       (pylint)
-      (blacken-buffer)
+      (format-all-buffer)
     ))
 
 (add-hook 'after-save-hook 'python-save-hook)
@@ -497,6 +497,10 @@ C-x C-M-s to jump through text on the current screen.
 (local-set-key (kbd "C-M-q") 'anzu-replace-at-cursor-thing)
 ))
 #+END_SRC
+(use-package format-all
+:hook(prog-mode)
+:bind("<f12>" . format-all-buffer)
+)
 ** Misc.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-M-g") 'query-replace-regexp)

@@ -9,20 +9,20 @@ Hi there! As you might have guessed, this is my EMACS config which I use pretty 
 Make sure that your .emacs.d directory is empty before cloning. A significant number of packages will be downloaded after the clone is done. Contact me with any inquiries which you might have.
 
 * Theme
-My favourite theme by far has to be spacemacs-dark.
 #+BEGIN_SRC emacs-lisp
-(use-package spacemacs-theme
-:defer t
-  :init (load-theme 'spacemacs-dark t))
+(use-package doom-themes
+	:diminish
+	:init (load-theme 'doom-one t)
+)
 #+END_SRC
 * Interface Settings
 These are built-in UI enhancements.
 ** Looks
-*** Eyebrowse Mode
+*** Workgroups
 #+BEGIN_SRC emacs-lisp
-(use-package eyebrowse
-:init(eyebrowse-mode t)
-)
+(use-package workgroups
+	:ensure t
+) 
 #+END_SRC
 *** Icon
 #+BEGIN_SRC emacs-lisp
@@ -43,8 +43,8 @@ The start up screen will be replaced with the dashboard package.
 Replace the -1 with a 1 keep these features.
 #+BEGIN_SRC emacs-lisp
 (menu-bar-mode -1)
-(toggle-scroll-bar -1) 
-(tool-bar-mode -1) 
+(toggle-scroll-bar -1)
+(tool-bar-mode -1)
 #+END_SRC
 
 *** Disable bell
@@ -63,68 +63,69 @@ A clock which shows in the mode line.
 *** Beacon
 
 Helps user find the line which they are editing when they swap buffer.
-#+BEGIN_SRC 
+#+BEGIN_SRC
 (use-package beacon
- :ensure t
- :config
-   (beacon-mode 1))
+	:ensure t
+	:config
+		(beacon-mode 1)
+)
 #+END_SRC
 
 *** Powerline (Mode line)
 This is the bar at the very bottom of the emacs window. This contains information relevant to the file that is currently being edited (for instance file name, minor and major modes used, current git branch and so on).
 #+BEGIN_SRC emacs-lisp
 (use-package powerline
-:ensure t
-:diminish
-:init (powerline-center-theme)
+	:ensure t
+	:diminish
+	:init (powerline-center-theme)
 )
 #+END_SRC
 
 **** Clean up clutter from mode-line
-  #+BEGIN_SRC 
-  (use-package rich-minority
-  :ensure t
-  :init(rich-minority-mode 1)
-  )
+#+BEGIN_SRC
+(use-package rich-minority
+	:ensure t
+	:init(rich-minority-mode 1)
+)
 
-  #+END_SRC
+#+END_SRC
 *** Customize frame name
  #+BEGIN_SRC emacs-lisp
  (setq-default frame-title-format '("Lucinda?"))
  #+END_SRC
 
-*** Diff hl mode
-Diff-hl mode shows where code has been changed.
-#+BEGIN_SRC emacs-lisp
-(use-package diff-hl
-:config(add-hook 'prog-mode-hook 'diff-hl-mode)
-)
-#+END_SRC
-
 *** Customize font-family and font size
 #+BEGIN_SRC emacs-lisp
 (set-frame-font "Consolas 12" nil t)
 #+END_SRC
+*** Neotree
+#+BEGIN_SRC emacs-lisp
+(use-package neotree
+:diminish
+:ensure t
+)
+#+END_SRC
+
 *** Speedbar
 Sr-Speedbar allows for speedbar (class navigator) to be docked in the same window.
 #+BEGIN_SRC emacs-lisp
 (require 'sr-speedbar)
 ;; fix so speedbar is in same window
 (with-eval-after-load "speedbar"
-  (autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
-  )
+	(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
+)
 #+END_SRC
 * Functionality
 ** Git gutter
 #+BEGIN_SRC emacs-lisp
 (use-package git-gutter+
-:ensure t
-:diminish
+	:ensure t
+	:diminish
 )
 
 (use-package git-gutter-fringe+
-:ensure t
-:diminish
+	:ensure t
+	:diminish
 )
 
 (require 'git-gutter+)
@@ -133,21 +134,21 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 (add-hook 'org-mode-hook 'git-gutter+-mode)
 
 (eval-after-load 'git-gutter+
-'(progn
-;;; Jump between hunks
-(define-key git-gutter+-mode-map (kbd "C-x n") 'git-gutter+-next-hunk)
-(define-key git-gutter+-mode-map (kbd "C-x p") 'git-gutter+-previous-hunk)
-
-;;; Act on hunks
-(define-key git-gutter+-mode-map (kbd "C-x v =") 'git-gutter+-show-hunk)
-
-;; Stage hunk at point.
-;; If region is active, stage all hunk lines within the region.
-(define-key git-gutter+-mode-map (kbd "C-x t") 'git-gutter+-stage-hunks)
-(define-key git-gutter+-mode-map (kbd "C-x c") 'git-gutter+-commit)
-(define-key git-gutter+-mode-map (kbd "C-x C") 'git-gutter+-stage-and-commit)
-(define-key git-gutter+-mode-map (kbd "C-x C-y") 'git-gutter+-stage-and-commit-whole-buffer)
-(define-key git-gutter+-mode-map (kbd "C-x U") 'git-gutter+-unstage-whole-buffer))
+	'(progn
+		;;; Jump between hunks
+		(define-key git-gutter+-mode-map (kbd "C-x n") 'git-gutter+-next-hunk)
+		(define-key git-gutter+-mode-map (kbd "C-x p") 'git-gutter+-previous-hunk)
+		
+		;;; Act on hunks
+		(define-key git-gutter+-mode-map (kbd "C-x v =") 'git-gutter+-show-hunk)
+		
+		;; Stage hunk at point.
+		;; If region is active, stage all hunk lines within the region.
+		(define-key git-gutter+-mode-map (kbd "C-x t") 'git-gutter+-stage-hunks)
+		(define-key git-gutter+-mode-map (kbd "C-x c") 'git-gutter+-commit)
+		(define-key git-gutter+-mode-map (kbd "C-x C") 'git-gutter+-stage-and-commit)
+		(define-key git-gutter+-mode-map (kbd "C-x C-y") 'git-gutter+-stage-and-commit-whole-buffer)
+		(define-key git-gutter+-mode-map (kbd "C-x U") 'git-gutter+-unstage-whole-buffer))
 )
 
 #+END_SRC
@@ -165,8 +166,8 @@ This is very important as sometimes you might encounter some different kinds of 
 ;; backwards compatibility as default-buffer-file-coding-system
 ;; is deprecated in 23.2.
 (if (boundp 'buffer-file-coding-system)
-    (setq-default buffer-file-coding-system 'utf-8)
-  (setq default-buffer-file-coding-system 'utf-8))
+	(setq-default buffer-file-coding-system 'utf-8)
+	(setq default-buffer-file-coding-system 'utf-8))
 
 ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
@@ -207,7 +208,7 @@ I have found that using flyspell adds lag and input delay whenever a key stroke 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell-lazy
 :ensure t
-:init (flyspell-lazy-mode 1)
+	:init (flyspell-lazy-mode 1)
 )
 #+END_SRC
 
@@ -215,8 +216,8 @@ I have found that using flyspell adds lag and input delay whenever a key stroke 
 This is a god send for beginners and novices alike. In short, this allows the user to see what key bindings they can use on the fly.
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
-:ensure t
-:init (which-key-mode)
+	:ensure t
+	:init (which-key-mode)
 )
 #+END_SRC
 
@@ -234,24 +235,27 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 ** Dictionary
 #+BEGIN_SRC emacs-lisp
 (use-package define-word
-:ensure t
-:bind ("C-x C-M-d" . define-word-at-point)
+	:diminish
+	:ensure t
+	:bind ("C-x C-M-d" . define-word-at-point)
 )
 #+END_SRC
 ** helm-ag
 =helm-ag= is used to search all of the files in a project.
 #+BEGIN_SRC emacs-lisp
 (use-package helm-ag
-:ensure t
-:bind("C-M-s" . helm-ag)
+	:diminish
+	:ensure t
+	:bind("C-M-s" . helm-ag)
 )
 #+END_SRC
 ** anzu
 =anzu= will be used to replace words in on the cursor
 #+BEGIN_SRC emacs-lisp
 (use-package anzu
-:ensure t
-:bind("C-r" . anzu-query-replace-at-cursor)
+	:diminish
+	:ensure t
+	:bind("C-r" . anzu-query-replace-at-cursor)
 )
 #+END_SRC
 ** Unbind certain keys
@@ -273,14 +277,14 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (setq org-latex-images-centered t)
 #+END_SRC
 ** Exporting to pdf
-#+BEGIN_SRC 
+#+BEGIN_SRC
 (setq org-latex-pdf-process
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 #+END_SRC
 
 ** Org Download
 #+BEGIN_SRC emacs-lisp
-(use-package org-download 
+(use-package org-download
 :ensure t
 )
 ;; Drag-and-drop to `dired`
@@ -288,8 +292,8 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (setq-default org-download-heading-lvl nil)
 
 (add-hook 'org-mode-hook (lambda()
-(local-set-key (kbd "C-M-y") 'org-download-yank)
-(org-toggle-inline-images)
+	(local-set-key (kbd "C-M-y") 'org-download-yank)
+	(org-toggle-inline-images)
 ))
 
 #+END_SRC
@@ -301,104 +305,95 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 
 * Programming
 **  Python Mode
-Taken from [[https://github.com/daedreth/UncleDavesEmacs%5D][Uncle Dave's Emacs Config]]
 #+BEGIN_SRC emacs-lisp
+(use-package auto-virtualenv
+	:ensure t
+)
+
+(use-package virtualenvwrapper
+	:ensure t
+	:init
+	(venv-initialize-interactive-shells)
+	(venv-initialize-eshell)
+)
+
 (defun python-init()
-"Python-mode-hook"
-(yas-minor-mode)
-(flycheck-mode)
-(pipenv-mode 1)
-(pipenv-activate)
-(eglot)
-(company-mode)
+	"Python-mode-hook"
+	(yas-minor-mode)
+	(flycheck-mode)
+	(pipenv-mode)
+	(pipenv-activate)
+	(eglot)
+	(company-mode)
+	(auto-virtualenv-set-virtualenv)
+	(local-set-key (kbd "<f8>") (lambda()
+		(pylint)
+		(blacken-buffer)
+))
 )
 
 (add-hook 'python-mode-hook 'python-init)
 
-(defun python-save-hook()
-  "Test of save hook"
-  (when (eq major-mode 'python-mode)
-      (pylint)
-      (format-all-buffer)
-    ))
-
-(add-hook 'after-save-hook 'python-save-hook)
 ;; From https://github.com/valignatev/dotfiles/blob/literate-config/.emacs.d/config.org
 (use-package company
-  :custom
-  (company-require-match nil)
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 1)
-  (company-tooltip-align-annotation t)
-  (company-frontends '(company-pseudo-tooltip-frontend
-		       company-echo-metadata-frontend))
-  :hook ((prog-mode . company-mode))
-  :bind (:map company-active-map
-         ("C-n" . company-select-next)
-         ("C-p" . company-select-previous)))
+	:custom
+	(company-require-match nil)
+	(company-minimum-prefix-length 1)
+	(company-idle-delay 1)
+	(company-tooltip-align-annotation t)
+	(company-frontends '(company-pseudo-tooltip-frontend
+			     company-echo-metadata-frontend))
+	:hook ((prog-mode . company-mode))
+	:bind (:map company-active-map
+	("C-n" . company-select-next)
+	("C-p" . company-select-previous)))
 
 (setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 #+END_SRC
 **  Java Mode
 #+BEGIN_SRC emacs-lisp
 (defun create-java-project (project-name group-id)
-"Creates a java project with the necessary directory structure"
-(interactive "sProject Name:\nsGroup ID:")
-(shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
+	"Creates a java project with the necessary directory structure"
+	(interactive "sProject Name:\nsGroup ID:")
+	(shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
 )
 
 (setq jdee-server-dir "~/.emacs.d/jdee-jar")
 
 (add-hook 'java-mode-hook (lambda()
-(local-set-key (kbd "<f1>") 'jdee-debug)
-(local-set-key (kbd "<f2>") 'jdee-debug-set-breakpoint)
-(local-set-key (kbd "<f3>") 'jdee-debug-step-into)
-(local-set-key (kbd "<f4>") 'jdee-debug-cont)
-(local-set-key (kbd "<f6>") 'jdee-maven-build)
+	(local-set-key (kbd "<f1>") 'jdee-debug)
+	(local-set-key (kbd "<f2>") 'jdee-debug-set-breakpoint)
+	(local-set-key (kbd "<f3>") 'jdee-debug-step-into)
+	(local-set-key (kbd "<f4>") 'jdee-debug-cont)
+	(local-set-key (kbd "<f6>") 'jdee-maven-build)
 ))
 
 
 #+END_SRC
 ** Yasnippet setup
-To create snippets, just write it out on any buffer and leave a '~' right behind the placeholder. Then highlight the region and use the command =aya-create=. Use =aya-persist-snippet= to save the created snippet. 
+To create snippets, just write it out on any buffer and leave a '~' right behind the placeholder. Then highlight the region and use the command =aya-create=. Use =aya-persist-snippet= to save the created snippet.
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-  :ensure t
+(use-package yasnippet
+	:ensure t
+	:config
+	(yas-reload-all)
+	(yas-global-mode)
 
-  :config
-  (use-package yasnippet-snippets 
-  :ensure t
+	(use-package yasnippet-snippets
+		:ensure t
+	)
 
 )
-  (yas-reload-all)
-  (yas-global-mode)
-  )
-  (use-package auto-yasnippet 
-  :ensure t		      
 
-  )
-#+END_SRC
-** HTML
-#+BEGIN_SRC emacs-lisp
-(require 'company)                                   ; load company mode
-(require 'company-web-html)                          ; load company mode html backend
-
-;; (setq company-minimum-prefix-length 0)            ; WARNING, probably you will get perfomance issue if min len is 0!
-(setq company-tooltip-limit 20)                      ; bigger popup window
-(setq company-tooltip-align-annotations 't)          ; align annotations to the right tooltip border
-(setq company-idle-delay .3)                         ; decrease delay before autocompletion popup shows
-(setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
-
-(add-hook 'web-mode-hook (lambda ()
-                          (set (make-local-variable 'company-backends) '(company-web-html))
-                          (company-mode t)))
-
+(use-package auto-yasnippet
+:ensure t
+ )
 #+END_SRC
 ** Smart Compile
 #+BEGIN_SRC emacs-lisp
 (require 'smart-compile)
 (add-hook 'prog-mode-hook (lambda()
-(local-set-key (kbd "C-c C-c") 'smart-compile)
+	(local-set-key (kbd "C-c C-c") 'smart-compile)
 ))
 #+END_SRC
 * Key Bindings
@@ -406,7 +401,7 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 =M-o= swaps window.
    #+BEGIN_SRC emacs-lisp
 (use-package ace-window
-:bind("M-o" . ace-window)
+	:bind("M-o" . ace-window)
 )
    #+END_SRC
 ** Find file in project
@@ -414,38 +409,38 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 =C-x= =C-M-f= to find a file in a project.
 #+BEGIN_SRC emacs-lisp
 (use-package find-file-in-project
-:ensure t
-:diminish
-:bind("C-x C-M-f" . find-file-in-project)
+	:ensure t
+	:diminish
+	:bind("C-x C-M-f" . find-file-in-project)
 )
 #+END_SRC
 
-** Speedbar
+** Neotree
 
-Speed bar is a class navigator. =C-<tab>= will be used to toggle it.
+=C-<tab>= will be used to toggle it.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook (lambda ()
-(local-set-key (kbd "C-<tab>") 'neotree-toggle)
+	(local-set-key (kbd "C-<tab>") 'neotree-toggle)
 ))
 #+END_SRC
+
 ** Multi Cursors
-   Multicursor down: =C->= Multicursor up : =C-<=
-   #+BEGIN_SRC emacs-lisp
+Multicursor down: =C->= Multicursor up : =C-<=
+#+BEGIN_SRC emacs-lisp
 (use-package multiple-cursors
-:ensure t
-:diminish
-:defer t
-:bind
-("C->" . mc/mark-next-like-this)
-("C-<" . mc/mark-previous-like-this)
+	:ensure t
+	:diminish 
+	:bind
+	("C->" . mc/mark-next-like-this)
+	("C-<" . mc/mark-previous-like-this)
 )
 
 (use-package ace-mc
-:ensure t
-:diminish
-:bind
-("C-M->" . ace-mc-add-multiple-cursors)
-("C-M-<" . ace-mc-add-multiple-cursors)
+	:ensure t
+	:diminish
+	:bind
+	("C-M->" . ace-mc-add-multiple-cursors)
+	("C-M-<" . ace-mc-add-multiple-cursors)
 )
 
 #+END_SRC
@@ -462,61 +457,50 @@ Speed bar is a class navigator. =C-<tab>= will be used to toggle it.
 To search for code there are two options. There is either helm swoop (M-s, C-x a s to search all buffers) and helm occur(C-s). M-y for the kill ring, C-x r m is to traverse through bookmarks and C-x C-f to find files.
 #+BEGIN_SRC emacs-lisp
 
-(use-package helm		      
-:ensure t			      
-:diminish			      
-:init			      
-:bind			      
-("M-s" . helm-swoop)		      
-("C-x a s" . helm-multi-swoop-all) 
-("C-s" . helm-occur)		      
-("M-y" . helm-show-kill-ring)      
-("C-x r m" . helm-bookmarks)	 
+(use-package helm
+	:ensure t
+	:diminish
+	:bind
+	("M-s" . helm-swoop)
+	("C-x a s" . helm-multi-swoop-all)
+	("C-s" . helm-occur)
+	("M-y" . helm-show-kill-ring)
+	("C-x r m" . helm-bookmarks)
+)
 
-)				 
-  
 #+END_SRC
 ** Ido
 #+BEGIN_SRC emacs-lisp
 (use-package ido
-    :diminish
-    :bind
-    ("C-x C-b" . ido-switch-buffer)
-    ("C-x C-f" . ido-find-file)
+	:diminish
+	:bind
+	("C-x C-b" . ido-switch-buffer)
+	("C-x C-f" . ido-find-file)
 )
 #+END_SRC
 ** Ace Jump Mode
 C-x C-M-s to jump through text on the current screen.
 #+BEGIN_SRC emacs-lisp
 (use-package ace-jump-mode
-:ensure t
-:defer t
-:diminish
-:bind("C-z" . ace-jump-mode)
+	:ensure t
+	:bind("C-z" . ace-jump-mode)
 )
 #+END_SRC
 ** Org Mode
 #+BEGIN_SRC emacs-lisp
 (setq-default org-download-image-dir "C:/users/lucam/pictures/orgimages/")
-
 (add-hook 'org-mode-hook (lambda()
-(local-set-key (kbd "C-s") 'helm-org-rifle)
-(local-set-key (kbd "M-s") 'helm-org-rifle-org-directory)
-(local-set-key (kbd "C-M-y") 'org-download-yank)
-(local-set-key (kbd "C-<return>") 'ispell-word)
-(local-set-key (kbd "C-M-q") 'anzu-replace-at-cursor-thing)
+	(local-set-key (kbd "C-s") 'helm-org-rifle)
+	(local-set-key (kbd "M-s") 'helm-org-rifle-org-directory)
+	(local-set-key (kbd "C-M-y") 'org-download-yank)
+	(local-set-key (kbd "C-<return>") 'ispell-word)
+	(local-set-key (kbd "C-M-q") 'anzu-replace-at-cursor-thing)
 ))
 #+END_SRC
-(use-package format-all
-:hook(prog-mode)
-:bind("<f12>" . format-all-buffer)
-)
 ** Misc.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-M-g") 'query-replace-regexp)
 (global-set-key (kbd "M-x") 'smex)
-
 (global-set-key (kbd "C-|") 'comment-box)
 (global-set-key (kbd "C-M-|") 'uncomment-region)
 #+END_SRC
-

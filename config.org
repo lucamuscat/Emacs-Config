@@ -17,7 +17,17 @@ My favourite theme by far has to be spacemacs-dark.
 #+END_SRC
 * Interface Settings
 These are built-in UI enhancements.
-** Looks 
+** Looks
+*** Eyebrowse Mode
+#+BEGIN_SRC emacs-lisp
+(use-package eyebrowse
+:init(eyebrowse-mode t)
+)
+#+END_SRC
+*** Icon
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons)
+#+END_SRC
 *** Removing startup screen
 The start up screen will be replaced with the dashboard package.
 #+BEGIN_SRC emacs-lisp

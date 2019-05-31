@@ -370,7 +370,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 
 
 #+END_SRC
-** HTML
+** TODO HTML
 #+BEGIN_SRC emacs-lisp
 (use-package zencoding-mode
 :ensure t

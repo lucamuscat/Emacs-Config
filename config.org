@@ -379,6 +379,14 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 :init(zencoding-mode)
 :bind("C-`" . zencoding-expand-line)
 ) 
+
+(use-package expand-region
+:ensure t
+:diminish
+:hook(html-mode)
+:bind("C-@" . mark-inner-tag)
+
+)
 #+END_SRC
 ** Yasnippet setup
 To create snippets, just write it out on any buffer and leave a '~' right behind the placeholder. Then highlight the region and use the command =aya-create=. Use =aya-persist-snippet= to save the created snippet.

@@ -12,22 +12,13 @@ Make sure that your .emacs.d directory is empty before cloning. A significant nu
 #+BEGIN_SRC emacs-lisp
 (use-package doom-themes
 	:diminish
+	:ensure t
 	:init (load-theme 'doom-one t)
 )
 #+END_SRC
 * Interface Settings
 These are built-in UI enhancements.
 ** Looks
-*** Workgroups
-#+BEGIN_SRC emacs-lisp
-(use-package workgroups
-	:ensure t
-) 
-#+END_SRC
-*** Icon
-#+BEGIN_SRC emacs-lisp
-(use-package all-the-icons)
-#+END_SRC
 *** Removing startup screen
 The start up screen will be replaced with the dashboard package.
 #+BEGIN_SRC emacs-lisp
@@ -326,18 +317,18 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	"Python-mode-hook"
 	(yas-minor-mode)
 	(flycheck-mode)
-	(pipenv-mode)
-	(pipenv-activate)
 	(eglot)
 	(company-mode)
-	(auto-virtualenv-set-virtualenv)
-	(local-set-key (kbd "<f8>") (lambda()
-		(pylint)
-		(blacken-buffer)
-))
 )
 
 (add-hook 'python-mode-hook 'python-init)
+
+(add-hook 'python-mode-hook (lambda()
+	(local-set-key (kbd "<f8>") (lambda()
+		(pylint)
+		(blacken-buffer)
+	))
+))
 
 ;; From https://github.com/valignatev/dotfiles/blob/literate-config/.emacs.d/config.org
 (use-package company
@@ -375,7 +366,8 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 
 
 #+END_SRC
-** TODO HTML
+
+** HTML
 #+BEGIN_SRC emacs-lisp
 (use-package zencoding-mode
 :ensure t
@@ -389,8 +381,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 :ensure t
 :diminish
 :hook(html-mode)
-:bind("C-@" . mark-inner-tag)
-
+:bind("C-@" . er/mark-inner-tag)
 )
 #+END_SRC
 ** Yasnippet setup
@@ -492,13 +483,13 @@ To search for code there are two options. There is either helm swoop (M-s, C-x a
 )
 
 #+END_SRC
-** Ido
+** Lusty-Explorer
 #+BEGIN_SRC emacs-lisp
-(use-package ido
+(use-package lusty-explorer
 	:diminish
 	:bind
-	("C-x C-b" . ido-switch-buffer)
-	("C-x C-f" . ido-find-file)
+	("C-x C-b" . lusty-buffer-explorer)
+	("C-x C-f" . lusty-file-explorer)
 )
 #+END_SRC
 ** Ace Jump Mode

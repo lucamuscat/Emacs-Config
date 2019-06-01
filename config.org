@@ -115,6 +115,15 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 	(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
 )
 #+END_SRC
+
+*** 80 char column
+#+BEGIN_SRC emacs-lisp
+(use-package column-enforce-mode
+	:diminish
+	:ensure t
+	:init(add-hook 'python-mode-hook 'column-enforce-mode)
+)
+#+END_SRC
 * Functionality
 ** Git gutter
 #+BEGIN_SRC emacs-lisp
@@ -189,7 +198,7 @@ This is what the user first encounters when they start up EMACS (an example of t
 #+BEGIN_SRC emacs-lisp
 (use-package dashboard
 :ensure t
-:config(setq dashboard-startup-banner "~/.emacs.d/dashboard.png")
+:config(setq dashboard-startup-banner "~/.emacs.d/download.png")
 (setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
 (setq dashboard-items '((recents  . 3)
                         (bookmarks . 3)

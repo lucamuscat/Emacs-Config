@@ -9,12 +9,29 @@ Hi there! As you might have guessed, this is my EMACS config which I use pretty 
 Make sure that your .emacs.d directory is empty before cloning. A significant number of packages will be downloaded after the clone is done. Contact me with any inquiries which you might have.
 
 * Initialization
+** GC Thresholds
 Increasing =gc-cons-threshold= to a very high number to will decrease the load and compile time. This will later be lowered back down to a more sane value to prevent complications
 #+BEGIN_SRC emacs-lisp
 (eval-and-compile
   (setq gc-cons-threshold 402653184
         gc-cons-percentage 0.6))
 #+END_SRC
+
+** Disablind package.el
+Disabling package.el from starting up will also reduce emacs init time.
+#+BEGIN_SRC emacs-lisp
+(setq package-enable-at-startup nil ; don't auto-initialize!
+      package--init-file-ensured t)
+#+END_SRC
+
+** Benchmark
+#+BEGIN_SRC emacs-lisp
+(use-package benchmark-init
+	:ensure t
+	:init(benchmark-init/activate)
+)
+#+END_SRC
+
 * Theme
 #+BEGIN_SRC emacs-lisp
 (use-package doom-themes
@@ -64,6 +81,7 @@ Helps user find the line which they are editing when they swap buffer.
 #+BEGIN_SRC
 (use-package beacon
 	:ensure t
+	:defer t
 	:config
 		(beacon-mode 1)
 )
@@ -83,6 +101,7 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 #+BEGIN_SRC
 (use-package rich-minority
 	:ensure t
+	:defer t
 	:init(rich-minority-mode 1)
 )
 
@@ -99,19 +118,22 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 *** Neotree
 #+BEGIN_SRC emacs-lisp
 (use-package neotree
-:diminish
-:ensure t
+	:diminish
+	:defer t
+	:ensure t
 )
 #+END_SRC
 
 *** Speedbar
 Sr-Speedbar allows for speedbar (class navigator) to be docked in the same window.
 #+BEGIN_SRC emacs-lisp
-(require 'sr-speedbar)
-;; fix so speedbar is in same window
-(with-eval-after-load "speedbar"
+(use-package sr-speedbar
+:init(with-eval-after-load "speedbar"
 	(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
 )
+)
+;; fix so speedbar is in same window
+
 #+END_SRC
 
 *** 80 char column
@@ -119,6 +141,7 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 (use-package column-enforce-mode
 	:diminish
 	:ensure t
+	:defer t
 	:init(add-hook 'python-mode-hook 'column-enforce-mode)
 )
 #+END_SRC
@@ -128,17 +151,18 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 (use-package git-gutter+
 	:ensure t
 	:diminish
+	:hook
+	(prog-mode . git-gutter+-mode)
+	(org-mode . git-gutter+-mode)
 )
 
 (use-package git-gutter-fringe+
 	:ensure t
+	:hook
+	(prog-mode . git-gutter+-mode)
+	(org-mode . git-gutter+-mode)
 	:diminish
 )
-
-(require 'git-gutter+)
-(require 'git-gutter-fringe+)
-(add-hook 'prog-mode-hook 'git-gutter+-mode)
-(add-hook 'org-mode-hook 'git-gutter+-mode)
 
 (eval-after-load 'git-gutter+
 	'(progn
@@ -214,7 +238,9 @@ This is what the user first encounters when they start up EMACS (an example of t
 I have found that using flyspell adds lag and input delay whenever a key stroke is pressed. This helps alleviate this issue by spell checking less often. Alternatively one may use flyspell buffer and check the buffer once a while whenever they deem it to be fit but this does the job automatically.
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell-lazy
-:ensure t
+	:ensure t
+	:defer t
+	:diminish
 	:init (flyspell-lazy-mode 1)
 )
 #+END_SRC
@@ -244,6 +270,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (use-package define-word
 	:diminish
 	:ensure t
+	:hook(org-mode)
 	:bind ("C-x C-M-d" . define-word-at-point)
 )
 #+END_SRC
@@ -251,7 +278,6 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 =helm-ag= is used to search all of the files in a project.
 #+BEGIN_SRC emacs-lisp
 (use-package helm-ag
-	:diminish
 	:ensure t
 	:bind("C-M-s" . helm-ag)
 )
@@ -315,6 +341,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 #+BEGIN_SRC emacs-lisp
 (use-package virtualenvwrapper
 	:ensure t
+	:hook(python-mode)
 	:init
 	(venv-initialize-interactive-shells)
 	(venv-initialize-eshell)
@@ -377,18 +404,17 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 ** HTML
 #+BEGIN_SRC emacs-lisp
 (use-package zencoding-mode
-:ensure t
-:diminish
-:hook(html-mode)
-:init(zencoding-mode)
-:bind("C-`" . zencoding-expand-line)
+	:ensure t
+	:diminish
+	:hook(html-mode)
+	:init(zencoding-mode)
+	:bind("C-`" . zencoding-expand-line)
 ) 
 
-(use-package expand-region
-:ensure t
-:diminish
-:hook(html-mode)
-:bind("C-@" . er/mark-inner-tag)
+(use-package web-beautify
+	:ensure t
+	:diminish
+	:hook(html-mode)
 )
 #+END_SRC
 ** Yasnippet setup
@@ -396,6 +422,10 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
 	:ensure t
+	:hook
+	(prog-mode)
+	(org-mode)
+	
 	:config
 	(yas-reload-all)
 	(yas-global-mode)
@@ -407,21 +437,29 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 )
 
 (use-package auto-yasnippet
-:ensure t
+	:ensure t
+	:hook
+	(prog-mode)
+	(org-mode)
+	:diminish
  )
 #+END_SRC
 ** Smart Compile
 #+BEGIN_SRC emacs-lisp
-(require 'smart-compile)
-(add-hook 'prog-mode-hook (lambda()
-	(local-set-key (kbd "C-c C-c") 'smart-compile)
-))
+(use-package smart-compile
+	:ensure t
+	:diminish
+	:hook prog-mode
+	:bind ("C-c C-c" . smart-compile)
+)
 #+END_SRC
 * Key Bindings
 ** Ace Window
 =M-o= swaps window.
    #+BEGIN_SRC emacs-lisp
 (use-package ace-window
+	:ensure t
+	:diminish
 	:bind("M-o" . ace-window)
 )
    #+END_SRC
@@ -493,6 +531,7 @@ To search for code there are two options. There is either helm swoop (M-s, C-x a
 ** Lusty-Explorer
 #+BEGIN_SRC emacs-lisp
 (use-package lusty-explorer
+	:ensure t
 	:diminish
 	:bind
 	("C-x C-b" . lusty-buffer-explorer)

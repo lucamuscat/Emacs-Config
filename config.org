@@ -8,6 +8,13 @@ Hi there! As you might have guessed, this is my EMACS config which I use pretty 
 
 Make sure that your .emacs.d directory is empty before cloning. A significant number of packages will be downloaded after the clone is done. Contact me with any inquiries which you might have.
 
+* Initialization
+Increasing =gc-cons-threshold= to a very high number to will decrease the load and compile time. This will later be lowered back down to a more sane value to prevent complications
+#+BEGIN_SRC emacs-lisp
+(eval-and-compile
+  (setq gc-cons-threshold 402653184
+        gc-cons-percentage 0.6))
+#+END_SRC
 * Theme
 #+BEGIN_SRC emacs-lisp
 (use-package doom-themes
@@ -335,7 +342,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	:custom
 	(company-require-match nil)
 	(company-minimum-prefix-length 1)
-	(company-idle-delay 1)
+	(company-idle-delay 0.4)
 	(company-tooltip-align-annotation t)
 	(company-frontends '(company-pseudo-tooltip-frontend
 			     company-echo-metadata-frontend))
@@ -517,4 +524,10 @@ C-x C-M-s to jump through text on the current screen.
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "C-|") 'comment-box)
 (global-set-key (kbd "C-M-|") 'uncomment-region)
+#+END_SRC
+* Post initialization
+Lowering the GC thresholds back to a sane level.
+#+BEGIN_SRC emacs-lisp
+(setq gc-cons-threshold 16777216
+      gc-cons-percentage 0.1)
 #+END_SRC

@@ -151,18 +151,16 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 (use-package git-gutter+
 	:ensure t
 	:diminish
-	:hook
-	(prog-mode . git-gutter+-mode)
-	(org-mode . git-gutter+-mode)
-)
-
-(use-package git-gutter-fringe+
-	:ensure t
-	:hook
-	(prog-mode . git-gutter+-mode)
-	(org-mode . git-gutter+-mode)
-	:diminish
-)
+	:hook(prog-mode . git-gutter+-mode)
+	:bind ("C-x n" . "")
+	("C-x n" . git-gutter+-next-hunk)
+	("C-x p" .  git-gutter+-previous-hunk)
+	("C-x v =" . git-gutter+-show-hunk)
+	("C-x t" . git-gutter+-stage-hunks)
+	("C-x c" . git-gutter+-commit)
+	("C-x C" . git-gutter+-stage-and-commit)
+	("C-x C-y" . git-gutter+-stage-and-commit-whole-buffer)
+	("C-x U" . git-gutter+-unstage-whole-buffer)
 
 (eval-after-load 'git-gutter+
 	'(progn

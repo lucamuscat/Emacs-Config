@@ -141,8 +141,8 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 (use-package column-enforce-mode
 	:diminish
 	:ensure t
-	:defer t
-	:init(add-hook 'python-mode-hook 'column-enforce-mode)
+	:hook (python-mode)
+	:init (column-enforce-mode)
 )
 #+END_SRC
 * Functionality
@@ -237,7 +237,7 @@ I have found that using flyspell adds lag and input delay whenever a key stroke 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell-lazy
 	:ensure t
-	:defer t
+	:hook (org-mode)
 	:diminish
 	:init (flyspell-lazy-mode 1)
 )
@@ -248,7 +248,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
 	:ensure t
-	:init (which-key-mode)
+	:config (which-key-mode)
 )
 #+END_SRC
 
@@ -316,17 +316,15 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 ** Org Download
 #+BEGIN_SRC emacs-lisp
 (use-package org-download
-:ensure t
-)
-;; Drag-and-drop to `dired`
-(add-hook 'dired-mode-hook 'org-download-enable)
-(setq-default org-download-heading-lvl nil)
-
-(add-hook 'org-mode-hook (lambda()
-	(local-set-key (kbd "C-M-y") 'org-download-yank)
+	:ensure t
+	:diminish
+	:hook(org-mode)
+	:config
+	(setq-default org-download-heading-lvl nil)
 	(org-toggle-inline-images)
-))
-
+	(setq-default org-download-image-dir "C:/users/lucam/pictures/orgimages/")
+	:bind(:map org-mode-map ("C-M-y" . org-download-yank))
+)
 #+END_SRC
 
 ** Table of contents options
@@ -337,12 +335,39 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 * Programming
 **  Python Mode
 #+BEGIN_SRC emacs-lisp
+(use-package python
+	:mode ("\\.py\\'" . python-mode)
+)
+
 (use-package virtualenvwrapper
 	:ensure t
-	:hook(python-mode)
-	:init
-	(venv-initialize-interactive-shells)
-	(venv-initialize-eshell)
+	:hook (python-mode)
+	:config(venv-initialize-interactive-shells)
+		(venv-initialize-eshell)
+)
+
+(use-package flycheck
+	:ensure t
+	:diminish
+	:hook(python-mode . flycheck-mode)
+)
+
+(use-package eglot
+	:ensure t
+	:hook (python-mode)
+	:diminish
+)
+
+(use-package blacken
+	:ensure t
+	:diminish
+	:hook (python-mode)
+)
+
+(use-package pylint
+	:ensure t
+	:diminish
+	:hook (python-mode)
 )
 
 (defun python-init()
@@ -486,6 +511,7 @@ Multicursor down: =C->= Multicursor up : =C-<=
 #+BEGIN_SRC emacs-lisp
 (use-package multiple-cursors
 	:ensure t
+	:commands (mc/mark-next-like-this mc/mark-previous-like-this)
 	:diminish 
 	:bind
 	("C->" . mc/mark-next-like-this)
@@ -494,6 +520,7 @@ Multicursor down: =C->= Multicursor up : =C-<=
 
 (use-package ace-mc
 	:ensure t
+	:commands (ace-mc-add-multiple-cursors)
 	:diminish
 	:bind
 	("C-M->" . ace-mc-add-multiple-cursors)
@@ -530,6 +557,7 @@ To search for code there are two options. There is either helm swoop (M-s, C-x a
 #+BEGIN_SRC emacs-lisp
 (use-package lusty-explorer
 	:ensure t
+	:commands(lusty-buffer-explorer lusty-file-explorer)
 	:diminish
 	:bind
 	("C-x C-b" . lusty-buffer-explorer)

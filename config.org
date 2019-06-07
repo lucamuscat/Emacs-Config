@@ -432,6 +432,8 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 
 ** HTML
 #+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.html\\'" . html-mode))
+
 (use-package zencoding-mode
 	:ensure t
 	:diminish

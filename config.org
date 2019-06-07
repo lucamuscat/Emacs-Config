@@ -603,7 +603,11 @@ C-x C-M-s to jump through text on the current screen.
 ** Misc.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-M-g") 'query-replace-regexp)
-(global-set-key (kbd "M-x") 'smex)
+(use-package smex
+	:ensure t
+	:diminish
+	:bind("M-x" . smex)
+)
 (global-set-key (kbd "C-|") 'comment-box)
 (global-set-key (kbd "C-M-|") 'uncomment-region)
 #+END_SRC

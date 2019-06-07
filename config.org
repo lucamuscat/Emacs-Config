@@ -553,7 +553,7 @@ To search for code there are two options. There is either helm swoop (M-s, C-x a
 	:ensure t
 	:diminish
 	:bind
-	("M-s" . helm-swoop)
+	("C-s" . helm-swoop)
 	("C-x a s" . helm-multi-swoop-all)
 	("C-s" . helm-occur)
 	("M-y" . helm-show-kill-ring)

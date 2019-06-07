@@ -423,7 +423,11 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	(local-set-key (kbd "<f6>") 'jdee-maven-build)
 ))
 
-
+(use-package jdee
+	:ensure t
+	:diminish
+	:defer t
+)
 #+END_SRC
 
 ** HTML

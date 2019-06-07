@@ -574,7 +574,16 @@ C-x C-M-s to jump through text on the current screen.
 #+END_SRC
 ** Org Mode
 #+BEGIN_SRC emacs-lisp
-(setq-default org-download-image-dir "C:/users/lucam/pictures/orgimages/")
+(use-package helm-org-rifle
+	:ensure t
+	:commands(helm-org-rifle helm-org-rifle-org-directory)
+	:diminish
+	:hook (org-mode)
+	:bind(:map org-mode-map
+	("C-s" . helm-org-rifle)
+	("M-s" . helm-org-rifle-org-directory))
+)
+
 (add-hook 'org-mode-hook (lambda()
 	(local-set-key (kbd "C-s") 'helm-org-rifle)
 	(local-set-key (kbd "M-s") 'helm-org-rifle-org-directory)

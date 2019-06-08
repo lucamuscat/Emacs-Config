@@ -429,8 +429,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (use-package zencoding-mode
 	:ensure t
 	:diminish
-	:hook(html-mode)
-	:init(zencoding-mode)
+	:hook(html-mode . zenconding-mode)
 	:bind("C-`" . zencoding-expand-line)
 ) 
 
@@ -452,7 +451,7 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 	:config
 	(yas-reload-all)
 	(yas-global-mode)
-
+	:hook(prog-mode)
 	(use-package yasnippet-snippets
 		:ensure t
 	)
@@ -461,9 +460,7 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 
 (use-package auto-yasnippet
 	:ensure t
-	:hook
-	(prog-mode)
-	(org-mode)
+	:hook(prog-mode)
 	:diminish
  )
 #+END_SRC

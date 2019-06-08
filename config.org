@@ -421,7 +421,6 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 	:config
 	(yas-reload-all)
 	(yas-global-mode)
-	:hook(prog-mode)
 	(use-package yasnippet-snippets
 		:ensure t
 	)
@@ -430,7 +429,6 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 
 (use-package auto-yasnippet
 	:ensure t
-	:hook(prog-mode)
 	:diminish
  )
 #+END_SRC

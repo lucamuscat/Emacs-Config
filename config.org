@@ -89,11 +89,14 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 )
 #+END_SRC
 
+*** Neotree
+#+BEGIN_SRC emacs-lisp
 (use-package neotree
 	:ensure t
 	:diminish
 	:hook(prog-mode)
-
+)
+#+END_SRC
 *** Customize frame name
  #+BEGIN_SRC emacs-lisp
  (setq-default frame-title-format '("Lucinda?"))
@@ -126,6 +129,14 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 #+END_SRC
 
 * Functionality
+** Magit
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+:ensure t
+:diminish
+:hook(prog-mode org-mode)
+)
+#+END_SRC
 ** Git gutter
 #+BEGIN_SRC emacs-lisp
 (use-package git-gutter+

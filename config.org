@@ -515,19 +515,8 @@ To search for code there are two options. There is either helm swoop (M-s, C-x a
 	("C-x a s" . helm-multi-swoop-all)
 	("M-y" . helm-show-kill-ring)
 	("C-x r m" . helm-bookmarks)
-)
-
-
-#+END_SRC
-** Lusty-Explorer
-#+BEGIN_SRC emacs-lisp
-(use-package lusty-explorer
-	:ensure t
-	:commands(lusty-buffer-explorer lusty-file-explorer)
-	:diminish
-	:bind
-	("C-x C-b" . lusty-buffer-explorer)
-	("C-x C-f" . lusty-file-explorer)
+	("C-x C-b" . helm-buffer-list)
+	("C-x C-f" . helm-find-files)
 )
 #+END_SRC
 ** Ace Jump Mode

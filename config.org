@@ -17,19 +17,11 @@ Increasing =gc-cons-threshold= to a very high number to will decrease the load a
         gc-cons-percentage 0.6))
 #+END_SRC
 
-** Disablind package.el
-Disabling package.el from starting up will also reduce emacs init time.
-#+BEGIN_SRC emacs-lisp
-(setq package-enable-at-startup nil ; don't auto-initialize!
-      package--init-file-ensured t)
-#+END_SRC
+** Preventing the scratch buffer from triggering prog mode
+This might sound highly specific. But when one considers the fact that the scratch buffer calls the =prog-mode-hook=, it's easy to realize that any packages that are loaded in through a prog-mode-hook will be loaded in on start up. Making the prog-mode-hook counter intuitive to begin with.
 
-** Benchmark
 #+BEGIN_SRC emacs-lisp
-(use-package benchmark-init
-	:ensure t
-	:init(benchmark-init/activate)
-)
+(setq initial-major-mode (quote fundamental-mode))
 #+END_SRC
 
 * Theme

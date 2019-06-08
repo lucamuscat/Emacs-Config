@@ -7,7 +7,6 @@ Hi there! As you might have guessed, this is my EMACS config which I use pretty 
 =git clone https://github.com/lucamuscat/Emacs-Config/blob/master/config.org=
 
 Make sure that your .emacs.d directory is empty before cloning. A significant number of packages will be downloaded after the clone is done. Contact me with any inquiries which you might have.
-
 * Initialization
 ** GC Thresholds
 Increasing =gc-cons-threshold= to a very high number to will decrease the load and compile time. This will later be lowered back down to a more sane value to prevent complications
@@ -29,7 +28,7 @@ This might sound highly specific. But when one considers the fact that the scrat
 (use-package doom-themes
 	:diminish
 	:ensure t
-	:init (load-theme 'doom-one t)
+	:config (load-theme 'doom-one t)
 )
 #+END_SRC
 * Interface Settings
@@ -38,7 +37,9 @@ These are built-in UI enhancements.
 *** Removing startup screen
 The start up screen will be replaced with the dashboard package.
 #+BEGIN_SRC emacs-lisp
-(setq inhibit-splash-screen t)
+(setq inhibit-splash-screen t
+initial-buffer-choice  nil
+)
 #+END_SRC
 
 *** Display Line Numbers
@@ -73,7 +74,6 @@ Helps user find the line which they are editing when they swap buffer.
 #+BEGIN_SRC
 (use-package beacon
 	:ensure t
-	:defer t
 	:config
 		(beacon-mode 1)
 )
@@ -89,15 +89,11 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 )
 #+END_SRC
 
-**** Clean up clutter from mode-line
-#+BEGIN_SRC
-(use-package rich-minority
+(use-package neotree
 	:ensure t
-	:defer t
-	:init(rich-minority-mode 1)
-)
+	:diminish
+	:hook(prog-mode)
 
-#+END_SRC
 *** Customize frame name
  #+BEGIN_SRC emacs-lisp
  (setq-default frame-title-format '("Lucinda?"))
@@ -107,15 +103,6 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 #+BEGIN_SRC emacs-lisp
 (set-frame-font "Consolas 12" nil t)
 #+END_SRC
-*** Neotree
-#+BEGIN_SRC emacs-lisp
-(use-package neotree
-	:diminish
-	:defer t
-	:ensure t
-)
-#+END_SRC
-
 *** Speedbar
 Sr-Speedbar allows for speedbar (class navigator) to be docked in the same window.
 #+BEGIN_SRC emacs-lisp
@@ -137,6 +124,7 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 	:init (column-enforce-mode)
 )
 #+END_SRC
+
 * Functionality
 ** Git gutter
 #+BEGIN_SRC emacs-lisp
@@ -153,29 +141,7 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 	("C-x C" . git-gutter+-stage-and-commit)
 	("C-x C-y" . git-gutter+-stage-and-commit-whole-buffer)
 	("C-x U" . git-gutter+-unstage-whole-buffer)
-
-(eval-after-load 'git-gutter+
-	'(progn
-		;;; Jump between hunks
-		(define-key git-gutter+-mode-map (kbd "C-x n") 'git-gutter+-next-hunk)
-		(define-key git-gutter+-mode-map (kbd "C-x p") 'git-gutter+-previous-hunk)
-		
-		;;; Act on hunks
-		(define-key git-gutter+-mode-map (kbd "C-x v =") 'git-gutter+-show-hunk)
-		
-		;; Stage hunk at point.
-		;; If region is active, stage all hunk lines within the region.
-		(define-key git-gutter+-mode-map (kbd "C-x t") 'git-gutter+-stage-hunks)
-		(define-key git-gutter+-mode-map (kbd "C-x c") 'git-gutter+-commit)
-		(define-key git-gutter+-mode-map (kbd "C-x C") 'git-gutter+-stage-and-commit)
-		(define-key git-gutter+-mode-map (kbd "C-x C-y") 'git-gutter+-stage-and-commit-whole-buffer)
-		(define-key git-gutter+-mode-map (kbd "C-x U") 'git-gutter+-unstage-whole-buffer))
 )
-
-#+END_SRC
-** IDO
-#+BEGIN_SRC emacs-lisp
-(ido-mode 1)
 #+END_SRC
 ** UTF-8
 This is very important as sometimes you might encounter some different kinds of characters in the the package list which will start throwing annoying errors.
@@ -234,7 +200,6 @@ I have found that using flyspell adds lag and input delay whenever a key stroke 
 	:init (flyspell-lazy-mode 1)
 )
 #+END_SRC
-
 ** Which-key
 This is a god send for beginners and novices alike. In short, this allows the user to see what key bindings they can use on the fly.
 #+BEGIN_SRC emacs-lisp
@@ -367,8 +332,6 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (defun python-init()
 	"Python-mode-hook"
 	(yas-minor-mode)
-	(flycheck-mode)
-	(eglot)
 	(company-mode)
 )
 
@@ -444,10 +407,6 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
 	:ensure t
-	:hook
-	(prog-mode)
-	(org-mode)
-	
 	:config
 	(yas-reload-all)
 	(yas-global-mode)
@@ -495,10 +454,9 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 #+END_SRC
 
 ** Neotree
-
 =C-<tab>= will be used to toggle it.
 #+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook (lambda ()
+(add-hook 'prog-mode-hook (lambda()
 	(local-set-key (kbd "C-<tab>") 'neotree-toggle)
 ))
 #+END_SRC
@@ -544,10 +502,10 @@ To search for code there are two options. There is either helm swoop (M-s, C-x a
 	:bind
 	("C-s" . helm-swoop)
 	("C-x a s" . helm-multi-swoop-all)
-	("C-s" . helm-occur)
 	("M-y" . helm-show-kill-ring)
 	("C-x r m" . helm-bookmarks)
 )
+
 
 #+END_SRC
 ** Lusty-Explorer
@@ -573,7 +531,6 @@ C-x C-M-s to jump through text on the current screen.
 #+BEGIN_SRC emacs-lisp
 (use-package helm-org-rifle
 	:ensure t
-	:commands(helm-org-rifle helm-org-rifle-org-directory)
 	:diminish
 	:hook (org-mode)
 	:bind(:map org-mode-map
@@ -582,11 +539,7 @@ C-x C-M-s to jump through text on the current screen.
 )
 
 (add-hook 'org-mode-hook (lambda()
-	(local-set-key (kbd "C-s") 'helm-org-rifle)
-	(local-set-key (kbd "M-s") 'helm-org-rifle-org-directory)
-	(local-set-key (kbd "C-M-y") 'org-download-yank)
 	(local-set-key (kbd "C-<return>") 'ispell-word)
-	(local-set-key (kbd "C-M-q") 'anzu-replace-at-cursor-thing)
 ))
 #+END_SRC
 ** Misc.

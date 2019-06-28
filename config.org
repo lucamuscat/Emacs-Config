@@ -9,20 +9,41 @@ Hi there! As you might have guessed, this is my EMACS config which I use pretty 
 Make sure that your .emacs.d directory is empty before cloning. A significant number of packages will be downloaded after the clone is done. Contact me with any inquiries which you might have.
 * Initialization
 ** GC Thresholds
-Increasing =gc-cons-threshold= to a very high number to will decrease the load and compile time. This will later be lowered back down to a more sane value to prevent complications
+Increasing =gc-cons-threshold= to a very high number to will decrease the load and compile time. This will later be lowered back down to a more sane value to prevent complications. ([[https://github.com/jwiegley/dot-emacs/blob/master/init.el][taken from J. Wiegley's init.el]])
+
 #+BEGIN_SRC emacs-lisp
-(eval-and-compile
-  (setq gc-cons-threshold 402653184
-        gc-cons-percentage 0.6))
+(defconst emacs-start-time (current-time))
+
+(defvar file-name-handler-alist-old file-name-handler-alist)
+
+(setq package-enable-at-startup nil
+      file-name-handler-alist nil
+      message-log-max 16384
+      gc-cons-threshold 402653184
+      gc-cons-percentage 0.6
+      auto-window-vscroll nil)
+
+(add-hook 'after-init-hook
+          `(lambda ()
+             (setq file-name-handler-alist file-name-handler-alist-old
+                   gc-cons-threshold 800000
+                   gc-cons-percentage 0.1)
+             (garbage-collect)) t)
 #+END_SRC
 
 ** Preventing the scratch buffer from triggering prog mode
-This might sound highly specific. But when one considers the fact that the scratch buffer calls the =prog-mode-hook=, it's easy to realize that any packages that are loaded in through a prog-mode-hook will be loaded in on start up. Making the prog-mode-hook counter intuitive to begin with.
+By default, the scratch buffer has a =prog-mode= major mode, this means that any package loaded in with the =prog-mode-hook= will be called unnecessarily. Making the prog-mode-hook counter intuitive to begin with.
 
 #+BEGIN_SRC emacs-lisp
 (setq initial-major-mode (quote fundamental-mode))
 #+END_SRC
 
+** Benchmark
+#+BEGIN_SRC emacs-lisp
+(use-package benchmark-init
+:init(benchmark-init/activate)
+)
+#+END_SRC
 * Theme
 #+BEGIN_SRC emacs-lisp
 (use-package doom-themes
@@ -43,8 +64,10 @@ initial-buffer-choice  nil
 #+END_SRC
 
 *** Display Line Numbers
+
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(add-hook 'sgml-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
 *** Disable menus and scroll bars
@@ -92,9 +115,12 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 *** Neotree
 #+BEGIN_SRC emacs-lisp
 (use-package neotree
-	:ensure t
+ :ensure t
 	:diminish
-	:hook(prog-mode)
+	:commands neotree-toggle neotree-refresh neotree
+	:bind(:map prog-mode-map
+	("C-<tab>" . neotree-toggle)
+)
 )
 #+END_SRC
 *** Customize frame name
@@ -104,10 +130,11 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 
 *** Customize font-family and font size
 #+BEGIN_SRC emacs-lisp
-(set-frame-font "Consolas 12" nil t)
+(set-frame-font "Consolas 14" nil t)
 #+END_SRC
 *** Speedbar
 Sr-Speedbar allows for speedbar (class navigator) to be docked in the same window.
+
 #+BEGIN_SRC emacs-lisp
 (use-package sr-speedbar
 :init(with-eval-after-load "speedbar"
@@ -123,8 +150,7 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 (use-package column-enforce-mode
 	:diminish
 	:ensure t
-	:hook (python-mode)
-	:init (column-enforce-mode)
+	:hook (python-mode . column-enforce-mode)
 )
 #+END_SRC
 
@@ -133,27 +159,26 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 #+BEGIN_SRC emacs-lisp
 (use-package magit
 :ensure t
+:defer t
 :diminish
-:hook(prog-mode org-mode)
 )
 #+END_SRC
-** Git gutter
+** Git Gutter
 #+BEGIN_SRC emacs-lisp
-(use-package git-gutter+
+(use-package git-gutter
 	:ensure t
 	:diminish
-	:hook(prog-mode . git-gutter+-mode)
-	:bind ("C-x n" . "")
-	("C-x n" . git-gutter+-next-hunk)
-	("C-x p" .  git-gutter+-previous-hunk)
-	("C-x v =" . git-gutter+-show-hunk)
-	("C-x t" . git-gutter+-stage-hunks)
-	("C-x c" . git-gutter+-commit)
-	("C-x C" . git-gutter+-stage-and-commit)
-	("C-x C-y" . git-gutter+-stage-and-commit-whole-buffer)
-	("C-x U" . git-gutter+-unstage-whole-buffer)
+	:hook (prog-mode . git-gutter-mode)
+	:bind (:map prog-mode-map 
+	("C-x t" . git-gutter:stage-hunk)
+	("C-x d" . git-gutter:popup-hunk)
+	("C-x n" . git-gutter:next-hunk)
+	("C-x p" . git-gutter:previous-hunk)
+	("C-x m" . git-gutter:mark-hunk))
 )
+
 #+END_SRC
+
 ** UTF-8
 This is very important as sometimes you might encounter some different kinds of characters in the the package list which will start throwing annoying errors.
 #+BEGIN_SRC emacs-lisp
@@ -206,9 +231,8 @@ I have found that using flyspell adds lag and input delay whenever a key stroke 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell-lazy
 	:ensure t
-	:hook (org-mode)
 	:diminish
-	:init (flyspell-lazy-mode 1)
+	:defer t
 )
 #+END_SRC
 ** Which-key
@@ -223,12 +247,15 @@ This is a god send for beginners and novices alike. In short, this allows the us
 ** ISpell Setup
 In order for ISpell and flycheck to work, a recent version of hunspell needs to be used.
 #+BEGIN_SRC emacs-lisp
-;; Spell Correct
-(setq ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
-;; "en_US" is key to lookup in `ispell-local-dictionary-alist`, please note it will be passed   to hunspell CLI as "-d" parameter
-(setq ispell-local-dictionary "en_US")
-(setq ispell-local-dictionary-alist
-    '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+(use-package ispell
+	:no-require t
+	:custom
+	(ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
+	(ispell-local-dictionary "en_US")
+	(ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+	:bind ("C-<return>" . ispell-word)
+)
+
 #+END_SRC
 
 ** Dictionary
@@ -236,8 +263,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (use-package define-word
 	:diminish
 	:ensure t
-	:hook(org-mode)
-	:bind ("C-x C-M-d" . define-word-at-point)
+	:defer t
 )
 #+END_SRC
 ** helm-ag
@@ -283,20 +309,6 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 #+END_SRC
 
-** Org Download
-#+BEGIN_SRC emacs-lisp
-(use-package org-download
-	:ensure t
-	:diminish
-	:hook(org-mode)
-	:config
-	(setq-default org-download-heading-lvl nil)
-	(org-toggle-inline-images)
-	(setq-default org-download-image-dir "C:/users/lucam/pictures/orgimages/")
-	:bind(:map org-mode-map ("C-M-y" . org-download-yank))
-)
-#+END_SRC
-
 ** Table of contents options
 #+BEGIN_SRC emacs-lisp
 (setq org-latex-toc-command "\\tableofcontents \\clearpage")
@@ -305,71 +317,51 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 * Programming
 **  Python Mode
 #+BEGIN_SRC emacs-lisp
-(use-package python
-	:mode ("\\.py\\'" . python-mode)
-)
+  (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 
-(use-package virtualenvwrapper
-	:ensure t
-	:hook (python-mode)
-	:config(venv-initialize-interactive-shells)
-		(venv-initialize-eshell)
-)
+  (use-package virtualenvwrapper
+	  :ensure t
+	  :config
+	  (venv-initialize-interactive-shells)
+	  (venv-initialize-eshell)
+  )
 
-(use-package flycheck
-	:ensure t
-	:diminish
-	:hook(python-mode . flycheck-mode)
-)
 
-(use-package eglot
-	:ensure t
-	:hook (python-mode)
-	:diminish
-)
+  (use-package flycheck
+	  :ensure t
+	  :commands (flycheck-mode
+	    flycheck-next-error
+	    flycheck-previous-error)
+	  :diminish
+	  :hook(python-mode . flycheck-mode)
+  )
 
-(use-package blacken
-	:ensure t
-	:diminish
-	:hook (python-mode)
-)
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; (use-package eglot				    ;;
+  ;; 	:ensure t				    ;;
+  ;; 	:hook(python-mode . eglot-ensure)	    ;;
+  ;; 	:diminish				    ;;
+  ;; )						    ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package pylint
-	:ensure t
-	:diminish
-	:hook (python-mode)
-)
+  (use-package blacken
+	  :ensure t
+	  :diminish
+	  :commands blacken-buffer
+  )
 
-(defun python-init()
-	"Python-mode-hook"
-	(yas-minor-mode)
-	(company-mode)
-)
+  (use-package pylint
+	  :ensure t
+	  :diminish
+	  :commands pylint
+  )
 
-(add-hook 'python-mode-hook 'python-init)
+  (use-package jedi
+	  :ensure t
+	  :hook(python-mode . jedi:setup)
+  )
 
-(add-hook 'python-mode-hook (lambda()
-	(local-set-key (kbd "<f8>") (lambda()
-		(pylint)
-		(blacken-buffer)
-	))
-))
-
-;; From https://github.com/valignatev/dotfiles/blob/literate-config/.emacs.d/config.org
-(use-package company
-	:custom
-	(company-require-match nil)
-	(company-minimum-prefix-length 1)
-	(company-idle-delay 0.4)
-	(company-tooltip-align-annotation t)
-	(company-frontends '(company-pseudo-tooltip-frontend
-			     company-echo-metadata-frontend))
-	:hook ((prog-mode . company-mode))
-	:bind (:map company-active-map
-	("C-n" . company-select-next)
-	("C-p" . company-select-previous)))
-
-(setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
+  (setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 #+END_SRC
 **  Java Mode
 #+BEGIN_SRC emacs-lisp
@@ -400,6 +392,38 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.html\\'" . html-mode))
 
+(use-package web-mode
+	:ensure t
+	:mode("\\.html\\'")
+	:bind(:map web-mode-map
+	("C-c C-e -" . web-mode-element-contract)
+	("C-c C-e +" . web-mode-element-extract)
+	("C-c C-e /" . web-mode-element-close)
+	("C-c C-e a" . web-mode-element-content-select)
+	("C-c C-e i" . web-mode-element-insert)
+	("C-c C-e w" . web-mode-element-wrap)
+	("C-c C-e k" . web-mode-element-kill)
+)
+)
+
+(use-package xah-css-mode
+	:ensure t
+	:mode("\\.css\\'")
+)
+
+(use-package simple-httpd
+	:ensure t
+	:diminish
+	:hook(web-mode . httpd-start)
+)
+
+(use-package impatient-mode
+	:ensure t
+	:after simple-httpd
+	:hook((web-mode xah-css-mode) . impatient-mode)
+	:config((browse-url-chromium "localhost:8080/imp/live"))
+)
+
 (use-package zencoding-mode
 	:ensure t
 	:diminish
@@ -410,7 +434,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (use-package web-beautify
 	:ensure t
 	:diminish
-	:hook(html-mode)
+	:commands (web-beautify-html web-beautify-css)
 )
 #+END_SRC
 ** Yasnippet setup
@@ -418,27 +442,29 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
 	:ensure t
+	:hook((prog-mode sgml-mode css-mode) . yas-global-mode)
+	:bind*("C-~" . yas-insert-snippet)
 	:config
 	(yas-reload-all)
-	(yas-global-mode)
 	(use-package yasnippet-snippets
 		:ensure t
 	)
-
 )
 
 (use-package auto-yasnippet
 	:ensure t
+	:after yasnippet
+	:commands(aya-create aya-expand aya-open-line)
 	:diminish
- )
+)
 #+END_SRC
 ** Smart Compile
 #+BEGIN_SRC emacs-lisp
 (use-package smart-compile
 	:ensure t
 	:diminish
-	:hook(python-mode)
-	:bind ("C-c C-c" . smart-compile)
+	:bind (:map prog-mode-map
+	("C-c C-c" . smart-compile))
 )
 #+END_SRC
 * Key Bindings
@@ -448,28 +474,10 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 (use-package ace-window
 	:ensure t
 	:diminish
+	:commands ace-window
 	:bind("M-o" . ace-window)
 )
    #+END_SRC
-** Find file in project
-
-=C-x= =C-M-f= to find a file in a project.
-#+BEGIN_SRC emacs-lisp
-(use-package find-file-in-project
-	:ensure t
-	:diminish
-	:bind("C-x C-M-f" . find-file-in-project)
-)
-#+END_SRC
-
-** Neotree
-=C-<tab>= will be used to toggle it.
-#+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook (lambda()
-	(local-set-key (kbd "C-<tab>") 'neotree-toggle)
-))
-#+END_SRC
-
 ** Multi Cursors
 Multicursor down: =C->= Multicursor up : =C-<=
 #+BEGIN_SRC emacs-lisp
@@ -504,16 +512,14 @@ Multicursor down: =C->= Multicursor up : =C-<=
 ** Helm
 To search for code there are two options. There is either helm swoop (M-s, C-x a s to search all buffers) and helm occur(C-s). M-y for the kill ring, C-x r m is to traverse through bookmarks and C-x C-f to find files.
 #+BEGIN_SRC emacs-lisp
-
 (use-package helm
 	:ensure t
 	:diminish
 	:bind
-	("C-s" . helm-swoop)
-	("C-x a s" . helm-multi-swoop-all)
+	("C-s" . helm-occur)
 	("M-y" . helm-show-kill-ring)
 	("C-x r m" . helm-bookmarks)
-	("C-x C-b" . helm-buffer-list)
+	("C-x C-b" . helm-buffers-list)
 	("C-x C-f" . helm-find-files)
 )
 #+END_SRC
@@ -522,23 +528,10 @@ C-x C-M-s to jump through text on the current screen.
 #+BEGIN_SRC emacs-lisp
 (use-package ace-jump-mode
 	:ensure t
-	:bind("C-z" . ace-jump-mode)
+	:bind
+	("C-z" . ace-jump-mode)
+	("M-z" . ace-jump-mode-pop-mark)
 )
-#+END_SRC
-** Org Mode
-#+BEGIN_SRC emacs-lisp
-(use-package helm-org-rifle
-	:ensure t
-	:diminish
-	:hook (org-mode)
-	:bind(:map org-mode-map
-	("C-s" . helm-org-rifle)
-	("M-s" . helm-org-rifle-org-directory))
-)
-
-(add-hook 'org-mode-hook (lambda()
-	(local-set-key (kbd "C-<return>") 'ispell-word)
-))
 #+END_SRC
 ** Misc.
 #+BEGIN_SRC emacs-lisp
@@ -548,8 +541,23 @@ C-x C-M-s to jump through text on the current screen.
 	:diminish
 	:bind("M-x" . smex)
 )
+
+(use-package isearch
+	:no-require t
+	:bind(("M-s" . isearch-forward)
+	("M-r" . isearch-backward))
+)
+
 (global-set-key (kbd "C-|") 'comment-box)
 (global-set-key (kbd "C-M-|") 'uncomment-region)
+#+END_SRC
+* Defers
+#+BEGIN_SRC emacs-lisp
+(use-package tramp :defer t)
+(use-package with-editor :defer t)
+(use-package org-agenda :defer t)
+(use-package speedbar :defer t)
+(use-package gud :defer t)
 #+END_SRC
 * Post initialization
 Lowering the GC thresholds back to a sane level.

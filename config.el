@@ -279,7 +279,6 @@ initial-buffer-choice  nil
 	:config
 	(yas-reload-all)
 	(yas-global-mode)
-	:hook(prog-mode)
 	(use-package yasnippet-snippets
 		:ensure t
 	)
@@ -288,7 +287,6 @@ initial-buffer-choice  nil
 
 (use-package auto-yasnippet
 	:ensure t
-	:hook(prog-mode)
 	:diminish
  )
 

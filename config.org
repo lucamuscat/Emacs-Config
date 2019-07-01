@@ -158,27 +158,17 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 ** Magit
 #+BEGIN_SRC emacs-lisp
 (use-package magit
-:ensure t
-:defer t
-:diminish
-)
-#+END_SRC
-** Git Gutter
-#+BEGIN_SRC emacs-lisp
-(use-package git-gutter
 	:ensure t
+	:defer t
 	:diminish
-	:hook (prog-mode . git-gutter-mode)
-	:bind (:map prog-mode-map 
-	("C-x t" . git-gutter:stage-hunk)
-	("C-x d" . git-gutter:popup-hunk)
-	("C-x n" . git-gutter:next-hunk)
-	("C-x p" . git-gutter:previous-hunk)
-	("C-x m" . git-gutter:mark-hunk))
+	:bind(:map prog-mode-map
+		("C-c u" . magit-diff-unstaged)
+		("C-c a" . magit-stage-file)
+		("C-c s" . magit-status)
+		("C-c c" . magit-commit-create)
+	)
 )
-
 #+END_SRC
-
 ** UTF-8
 This is very important as sometimes you might encounter some different kinds of characters in the the package list which will start throwing annoying errors.
 #+BEGIN_SRC emacs-lisp

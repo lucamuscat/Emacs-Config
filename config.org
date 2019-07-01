@@ -321,11 +321,9 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 
   (use-package virtualenvwrapper
 	  :ensure t
-	  :config
-	  (venv-initialize-interactive-shells)
-	  (venv-initialize-eshell)
+	  :hook (python-mode . venv-initialize-interactive-shells)
+	  :hook (python-mode . venv-initialize-eshell)
   )
-
 
   (use-package flycheck
 	  :ensure t

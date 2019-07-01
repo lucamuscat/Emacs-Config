@@ -168,6 +168,19 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 		("C-c c" . magit-commit-create)
 	)
 )
+
+(use-package git-gutter
+	:ensure t
+	:diminish
+	:hook (prog-mode . git-gutter-mode)
+	:hook (magit-post-refresh . git-gutter:update-all-windows)
+	:bind(:map prog-mode-map
+		("C-x n" . git-gutter:next-hunk)
+ 		("C-x p" . git-gutter:previous-hunk)
+		("C-x m" . git-gutter:mark-hunk)
+		("C-x t" . git-gutter:stage-hunk)
+)
+)
 #+END_SRC
 ** UTF-8
 This is very important as sometimes you might encounter some different kinds of characters in the the package list which will start throwing annoying errors.

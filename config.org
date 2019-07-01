@@ -411,25 +411,18 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	:mode("\\.css\\'")
 )
 
-(use-package simple-httpd
-	:ensure t
-	:diminish
-	:hook(web-mode . httpd-start)
-)
-
 (use-package impatient-mode
 	:ensure t
 	:after simple-httpd
 	:hook((web-mode xah-css-mode) . impatient-mode)
-	:config((browse-url-chromium "localhost:8080/imp/live"))
 )
 
 (use-package zencoding-mode
 	:ensure t
 	:diminish
 	:hook(html-mode . zenconding-mode)
-	:bind("C-`" . zencoding-expand-line)
-) 
+	:bind(:map web-mode-map("C-`" . zencoding-expand-line))
+)
 
 (use-package web-beautify
 	:ensure t
@@ -442,7 +435,7 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
 	:ensure t
-	:hook((prog-mode sgml-mode css-mode) . yas-global-mode)
+	:hook(prog-mode . yas-global-mode)
 	:bind*("C-~" . yas-insert-snippet)
 	:config
 	(yas-reload-all)

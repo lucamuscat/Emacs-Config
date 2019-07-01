@@ -168,6 +168,12 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 	)
 )
 
+(use-package vc
+	:no-require t
+	:diminish
+	:bind("C-x d" . vc-diff)
+)
+
 (use-package git-gutter
 	:ensure t
 	:diminish

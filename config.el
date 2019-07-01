@@ -18,6 +18,10 @@
 
 (setq initial-major-mode (quote fundamental-mode))
 
+(use-package benchmark-init
+:init(benchmark-init/activate)
+)
+
 (use-package doom-themes
 	:diminish
 	:ensure t
@@ -29,6 +33,7 @@ initial-buffer-choice  nil
 )
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(add-hook 'sgml-mode-hook 'display-line-numbers-mode)
 
 (menu-bar-mode -1)
 (toggle-scroll-bar -1)
@@ -47,14 +52,17 @@ initial-buffer-choice  nil
 )
 
 (use-package neotree
-	:ensure t
+ :ensure t
 	:diminish
-	:hook(prog-mode)
+	:commands neotree-toggle neotree-refresh neotree
+	:bind(:map prog-mode-map
+	("C-<tab>" . neotree-toggle)
+)
 )
 
 (setq-default frame-title-format '("Lucinda?"))
 
-(set-frame-font "Consolas 12" nil t)
+(set-frame-font "Consolas 14" nil t)
 
 (use-package sr-speedbar
 :init(with-eval-after-load "speedbar"
@@ -66,29 +74,25 @@ initial-buffer-choice  nil
 (use-package column-enforce-mode
 	:diminish
 	:ensure t
-	:hook (python-mode)
-	:init (column-enforce-mode)
+	:hook (python-mode . column-enforce-mode)
 )
 
 (use-package magit
 :ensure t
+:defer t
 :diminish
-:hook(prog-mode org-mode)
 )
 
-(use-package git-gutter+
+(use-package git-gutter
 	:ensure t
 	:diminish
-	:hook(prog-mode . git-gutter+-mode)
-	:bind ("C-x n" . "")
-	("C-x n" . git-gutter+-next-hunk)
-	("C-x p" .  git-gutter+-previous-hunk)
-	("C-x v =" . git-gutter+-show-hunk)
-	("C-x t" . git-gutter+-stage-hunks)
-	("C-x c" . git-gutter+-commit)
-	("C-x C" . git-gutter+-stage-and-commit)
-	("C-x C-y" . git-gutter+-stage-and-commit-whole-buffer)
-	("C-x U" . git-gutter+-unstage-whole-buffer)
+	:hook (prog-mode . git-gutter-mode)
+	:bind (:map prog-mode-map 
+	("C-x t" . git-gutter:stage-hunk)
+	("C-x d" . git-gutter:popup-hunk)
+	("C-x n" . git-gutter:next-hunk)
+	("C-x p" . git-gutter:previous-hunk)
+	("C-x m" . git-gutter:mark-hunk))
 )
 
 (prefer-coding-system 'utf-8)
@@ -125,9 +129,8 @@ initial-buffer-choice  nil
 
 (use-package flyspell-lazy
 	:ensure t
-	:hook (org-mode)
 	:diminish
-	:init (flyspell-lazy-mode 1)
+	:defer t
 )
 
 (use-package which-key
@@ -135,18 +138,19 @@ initial-buffer-choice  nil
 	:config (which-key-mode)
 )
 
-;; Spell Correct
-(setq ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
-;; "en_US" is key to lookup in `ispell-local-dictionary-alist`, please note it will be passed   to hunspell CLI as "-d" parameter
-(setq ispell-local-dictionary "en_US")
-(setq ispell-local-dictionary-alist
-    '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+(use-package ispell
+	:no-require t
+	:custom
+	(ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
+	(ispell-local-dictionary "en_US")
+	(ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+	:bind ("C-<return>" . ispell-word)
+)
 
 (use-package define-word
 	:diminish
 	:ensure t
-	:hook(org-mode)
-	:bind ("C-x C-M-d" . define-word-at-point)
+	:defer t
 )
 
 (use-package helm-ag
@@ -172,82 +176,51 @@ initial-buffer-choice  nil
 (setq org-latex-image-default-height "8cm")
 (setq org-latex-images-centered t)
 
-(use-package org-download
-	:ensure t
-	:diminish
-	:hook(org-mode)
-	:config
-	(setq-default org-download-heading-lvl nil)
-	(org-toggle-inline-images)
-	(setq-default org-download-image-dir "C:/users/lucam/pictures/orgimages/")
-	:bind(:map org-mode-map ("C-M-y" . org-download-yank))
-)
-
 (setq org-latex-toc-command "\\tableofcontents \\clearpage")
 
-(use-package python
-	:mode ("\\.py\\'" . python-mode)
-)
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 
 (use-package virtualenvwrapper
 	:ensure t
-	:hook (python-mode)
-	:config(venv-initialize-interactive-shells)
-		(venv-initialize-eshell)
+	:config
+	(venv-initialize-interactive-shells)
+	(venv-initialize-eshell)
 )
+
 
 (use-package flycheck
 	:ensure t
+	:commands (flycheck-mode
+	  flycheck-next-error
+	  flycheck-previous-error)
 	:diminish
 	:hook(python-mode . flycheck-mode)
 )
 
-(use-package eglot
-	:ensure t
-	:hook (python-mode)
-	:diminish
-)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (use-package eglot				    ;;
+;; 	:ensure t				    ;;
+;; 	:hook(python-mode . eglot-ensure)	    ;;
+;; 	:diminish				    ;;
+;; )						    ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package blacken
 	:ensure t
 	:diminish
-	:hook (python-mode)
+	:commands blacken-buffer
 )
 
 (use-package pylint
 	:ensure t
 	:diminish
-	:hook (python-mode)
+	:commands pylint
 )
 
-(defun python-init()
-	"Python-mode-hook"
-	(yas-minor-mode)
-	(company-mode)
+(use-package jedi
+	:ensure t
+	:hook(python-mode . jedi:setup)
 )
-
-(add-hook 'python-mode-hook 'python-init)
-
-(add-hook 'python-mode-hook (lambda()
-	(local-set-key (kbd "<f8>") (lambda()
-		(pylint)
-		(blacken-buffer)
-	))
-))
-
-;; From https://github.com/valignatev/dotfiles/blob/literate-config/.emacs.d/config.org
-(use-package company
-	:custom
-	(company-require-match nil)
-	(company-minimum-prefix-length 1)
-	(company-idle-delay 0.4)
-	(company-tooltip-align-annotation t)
-	(company-frontends '(company-pseudo-tooltip-frontend
-			     company-echo-metadata-frontend))
-	:hook ((prog-mode . company-mode))
-	:bind (:map company-active-map
-	("C-n" . company-select-next)
-	("C-p" . company-select-previous)))
 
 (setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 
@@ -275,6 +248,38 @@ initial-buffer-choice  nil
 
 (add-to-list 'auto-mode-alist '("\\.html\\'" . html-mode))
 
+(use-package web-mode
+	:ensure t
+	:mode("\\.html\\'")
+	:bind(:map web-mode-map
+	("C-c C-e -" . web-mode-element-contract)
+	("C-c C-e +" . web-mode-element-extract)
+	("C-c C-e /" . web-mode-element-close)
+	("C-c C-e a" . web-mode-element-content-select)
+	("C-c C-e i" . web-mode-element-insert)
+	("C-c C-e w" . web-mode-element-wrap)
+	("C-c C-e k" . web-mode-element-kill)
+)
+)
+
+(use-package xah-css-mode
+	:ensure t
+	:mode("\\.css\\'")
+)
+
+(use-package simple-httpd
+	:ensure t
+	:diminish
+	:hook(web-mode . httpd-start)
+)
+
+(use-package impatient-mode
+	:ensure t
+	:after simple-httpd
+	:hook((web-mode xah-css-mode) . impatient-mode)
+	:config((browse-url-chromium "localhost:8080/imp/live"))
+)
+
 (use-package zencoding-mode
 	:ensure t
 	:diminish
@@ -285,47 +290,40 @@ initial-buffer-choice  nil
 (use-package web-beautify
 	:ensure t
 	:diminish
-	:hook(html-mode)
+	:commands (web-beautify-html web-beautify-css)
 )
 
 (use-package yasnippet
 	:ensure t
+	:hook((prog-mode sgml-mode css-mode) . yas-global-mode)
+	:bind*("C-~" . yas-insert-snippet)
 	:config
 	(yas-reload-all)
-	(yas-global-mode)
 	(use-package yasnippet-snippets
 		:ensure t
 	)
-
 )
 
 (use-package auto-yasnippet
 	:ensure t
+	:after yasnippet
+	:commands(aya-create aya-expand aya-open-line)
 	:diminish
- )
+)
 
 (use-package smart-compile
 	:ensure t
 	:diminish
-	:hook(python-mode)
-	:bind ("C-c C-c" . smart-compile)
+	:bind (:map prog-mode-map
+	("C-c C-c" . smart-compile))
 )
 
 (use-package ace-window
 	:ensure t
 	:diminish
+	:commands ace-window
 	:bind("M-o" . ace-window)
 )
-
-(use-package find-file-in-project
-	:ensure t
-	:diminish
-	:bind("C-x C-M-f" . find-file-in-project)
-)
-
-(add-hook 'prog-mode-hook (lambda()
-	(local-set-key (kbd "C-<tab>") 'neotree-toggle)
-))
 
 (use-package multiple-cursors
 	:ensure t
@@ -354,31 +352,19 @@ initial-buffer-choice  nil
 	:ensure t
 	:diminish
 	:bind
-	("C-s" . helm-swoop)
-	("C-x a s" . helm-multi-swoop-all)
+	("C-s" . helm-occur)
 	("M-y" . helm-show-kill-ring)
 	("C-x r m" . helm-bookmarks)
-	("C-x C-b" . helm-buffer-list)
+	("C-x C-b" . helm-buffers-list)
 	("C-x C-f" . helm-find-files)
 )
 
 (use-package ace-jump-mode
 	:ensure t
-	:bind("C-z" . ace-jump-mode)
+	:bind
+	("C-z" . ace-jump-mode)
+	("M-z" . ace-jump-mode-pop-mark)
 )
-
-(use-package helm-org-rifle
-	:ensure t
-	:diminish
-	:hook (org-mode)
-	:bind(:map org-mode-map
-	("C-s" . helm-org-rifle)
-	("M-s" . helm-org-rifle-org-directory))
-)
-
-(add-hook 'org-mode-hook (lambda()
-	(local-set-key (kbd "C-<return>") 'ispell-word)
-))
 
 (global-set-key (kbd "C-M-g") 'query-replace-regexp)
 (use-package smex
@@ -386,8 +372,21 @@ initial-buffer-choice  nil
 	:diminish
 	:bind("M-x" . smex)
 )
+
+(use-package isearch
+	:no-require t
+	:bind(("M-s" . isearch-forward)
+	("M-r" . isearch-backward))
+)
+
 (global-set-key (kbd "C-|") 'comment-box)
 (global-set-key (kbd "C-M-|") 'uncomment-region)
+
+(use-package tramp :defer t)
+(use-package with-editor :defer t)
+(use-package org-agenda :defer t)
+(use-package speedbar :defer t)
+(use-package gud :defer t)
 
 (setq gc-cons-threshold 16777216
       gc-cons-percentage 0.1)

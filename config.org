@@ -407,7 +407,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (use-package web-beautify
 	:ensure t
 	:diminish
-	:commands (web-beautify-html web-beautify-css)
+	:defer t
 )
 #+END_SRC
 ** Yasnippet setup

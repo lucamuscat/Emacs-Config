@@ -1,6 +1,5 @@
 #+TITLE: My Emacs Config :)
 #+AUTHOR: Luca Muscat
-
 Hi there! As you might have guessed, this is my EMACS config which I use pretty often. There are some basic plugins in here which in my opinion everyone should be using. Hope that you could learn something by going through my config.
 * Installation
 ** Quick Installation
@@ -176,10 +175,7 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 	:hook (magit-post-refresh . git-gutter:update-all-windows)
 	:bind(:map prog-mode-map
 		("C-x n" . git-gutter:next-hunk)
- 		("C-x p" . git-gutter:previous-hunk)
-		("C-x m" . git-gutter:mark-hunk)
-		("C-x t" . git-gutter:stage-hunk)
-)
+		("C-x p" . git-gutter:previous-hunk))
 )
 #+END_SRC
 ** UTF-8
@@ -295,28 +291,20 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (global-unset-key "\C-x\C-c")
 #+END_SRC
 * Org Mode
-** Disable inline images
+** Customizations
 #+BEGIN_SRC emacs-lisp
-(setq org-startup-with-inline-images nil)
+(use-package org
+	:mode("\\.org\\'")
+	:custom
+	(org-startup-with-inline-images nil)
+	(org-latex-image-default-width "8cm")
+	(org-latex-image-default-height "8cm")
+	(org-latex-images-centered t)
+	(org-latex-pdf-process
+	'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+      (org-latex-toc-command "\\tableofcontents \\clearpage")
+)
 #+END_SRC
-
-** Latex Image properties
-#+BEGIN_SRC emacs-lisp
-(setq org-latex-image-default-width "8cm")
-(setq org-latex-image-default-height "8cm")
-(setq org-latex-images-centered t)
-#+END_SRC
-** Exporting to pdf
-#+BEGIN_SRC
-(setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-#+END_SRC
-
-** Table of contents options
-#+BEGIN_SRC emacs-lisp
-(setq org-latex-toc-command "\\tableofcontents \\clearpage")
-#+END_SRC
-
 * Programming
 **  Python Mode
 #+BEGIN_SRC emacs-lisp
@@ -404,6 +392,11 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	:mode("\\.css\\'")
 )
 
+(use-package simple-httpd
+	:no-require t
+	:hook (web-mode . httpd-start)
+)
+
 (use-package impatient-mode
 	:ensure t
 	:after simple-httpd
@@ -470,7 +463,7 @@ Multicursor down: =C->= Multicursor up : =C-<=
 (use-package multiple-cursors
 	:ensure t
 	:commands (mc/mark-next-like-this mc/mark-previous-like-this)
-	:diminish 
+	:diminish
 	:bind
 	("C->" . mc/mark-next-like-this)
 	("C-<" . mc/mark-previous-like-this)

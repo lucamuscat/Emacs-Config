@@ -78,21 +78,28 @@ initial-buffer-choice  nil
 )
 
 (use-package magit
-:ensure t
-:defer t
-:diminish
-)
-
-(use-package git-gutter
 	:ensure t
+	:defer t
 	:diminish
-	:hook (prog-mode . git-gutter-mode)
-	:bind (:map prog-mode-map 
-	("C-x t" . git-gutter:stage-hunk)
-	("C-x d" . git-gutter:popup-hunk)
-	("C-x n" . git-gutter:next-hunk)
-	("C-x p" . git-gutter:previous-hunk)
-	("C-x m" . git-gutter:mark-hunk))
+	:bind(:map prog-mode-map
+		("C-c u" . magit-diff-unstaged)
+		("C-c a" . magit-stage-file)
+		("C-c s" . magit-status)
+		("C-c c" . magit-commit-create)
+	)
+)
+
+(use-package git-gutter
+	:ensure t
+	:diminish
+	:hook (prog-mode . git-gutter-mode)
+	:hook (magit-post-refresh . git-gutter:update-all-windows)
+	:bind(:map prog-mode-map
+		("C-x n" . git-gutter:next-hunk)
+ 		("C-x p" . git-gutter:previous-hunk)
+		("C-x m" . git-gutter:mark-hunk)
+		("C-x t" . git-gutter:stage-hunk)
+)
 )
 
 (prefer-coding-system 'utf-8)
@@ -182,11 +189,9 @@ initial-buffer-choice  nil
 
 (use-package virtualenvwrapper
 	:ensure t
-	:config
-	(venv-initialize-interactive-shells)
-	(venv-initialize-eshell)
+	:hook (python-mode . venv-initialize-interactive-shells)
+	:hook (python-mode . venv-initialize-eshell)
 )
-
 
 (use-package flycheck
 	:ensure t
@@ -197,24 +202,16 @@ initial-buffer-choice  nil
 	:hook(python-mode . flycheck-mode)
 )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (use-package eglot				    ;;
-;; 	:ensure t				    ;;
-;; 	:hook(python-mode . eglot-ensure)	    ;;
-;; 	:diminish				    ;;
-;; )						    ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (use-package blacken
 	:ensure t
 	:diminish
-	:commands blacken-buffer
+	:defer t
 )
 
 (use-package pylint
 	:ensure t
 	:diminish
-	:commands pylint
+	:defer t
 )
 
 (use-package jedi
@@ -267,35 +264,28 @@ initial-buffer-choice  nil
 	:mode("\\.css\\'")
 )
 
-(use-package simple-httpd
-	:ensure t
-	:diminish
-	:hook(web-mode . httpd-start)
-)
-
 (use-package impatient-mode
 	:ensure t
 	:after simple-httpd
 	:hook((web-mode xah-css-mode) . impatient-mode)
-	:config((browse-url-chromium "localhost:8080/imp/live"))
 )
 
 (use-package zencoding-mode
 	:ensure t
 	:diminish
 	:hook(html-mode . zenconding-mode)
-	:bind("C-`" . zencoding-expand-line)
-) 
+	:bind(:map web-mode-map("C-`" . zencoding-expand-line))
+)
 
 (use-package web-beautify
 	:ensure t
 	:diminish
-	:commands (web-beautify-html web-beautify-css)
+	:defer t
 )
 
 (use-package yasnippet
 	:ensure t
-	:hook((prog-mode sgml-mode css-mode) . yas-global-mode)
+	:hook(prog-mode . yas-global-mode)
 	:bind*("C-~" . yas-insert-snippet)
 	:config
 	(yas-reload-all)

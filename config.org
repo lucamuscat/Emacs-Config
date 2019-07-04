@@ -1,0 +1,546 @@
+#+TITLE: My Emacs Config :)
+#+AUTHOR: Luca Muscat
+
+Hi there! As you might have guessed, this is my EMACS config which I use pretty often. There are some basic plugins in here which in my opinion everyone should be using. Hope that you could learn something by going through my config.
+* Installation
+** Quick Installation
+=git clone https://github.com/lucamuscat/Emacs-Config/blob/master/config.org=
+
+Make sure that your .emacs.d directory is empty before cloning. A significant number of packages will be downloaded after the clone is done. Contact me with any inquiries which you might have.
+* Initialization
+** GC Thresholds
+Increasing =gc-cons-threshold= to a very high number to will decrease the load and compile time. This will later be lowered back down to a more sane value to prevent complications. ([[https://github.com/jwiegley/dot-emacs/blob/master/init.el][taken from J. Wiegley's init.el]])
+
+#+BEGIN_SRC emacs-lisp
+(defconst emacs-start-time (current-time))
+
+(defvar file-name-handler-alist-old file-name-handler-alist)
+
+(setq package-enable-at-startup nil
+      file-name-handler-alist nil
+      message-log-max 16384
+      gc-cons-threshold 402653184
+      gc-cons-percentage 0.6
+      auto-window-vscroll nil)
+
+(add-hook 'after-init-hook
+          `(lambda ()
+             (setq file-name-handler-alist file-name-handler-alist-old
+                   gc-cons-threshold 800000
+                   gc-cons-percentage 0.1)
+             (garbage-collect)) t)
+#+END_SRC
+
+** Preventing the scratch buffer from triggering prog mode
+By default, the scratch buffer has a =prog-mode= major mode, this means that any package loaded in with the =prog-mode-hook= will be called unnecessarily. Making the prog-mode-hook counter intuitive to begin with.
+
+#+BEGIN_SRC emacs-lisp
+(setq initial-major-mode (quote fundamental-mode))
+#+END_SRC
+
+** Benchmark
+#+BEGIN_SRC emacs-lisp
+(use-package benchmark-init
+:init(benchmark-init/activate)
+)
+#+END_SRC
+* Theme
+#+BEGIN_SRC emacs-lisp
+(use-package doom-themes
+	:diminish
+	:ensure t
+	:config (load-theme 'doom-city-lights t)
+)
+#+END_SRC
+* Interface Settings
+These are built-in UI enhancements.
+** Looks
+*** Removing startup screen
+The start up screen will be replaced with the dashboard package.
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-splash-screen t
+initial-buffer-choice  nil
+)
+#+END_SRC
+
+*** Display Line Numbers
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+END_SRC
+
+*** Disable menus and scroll bars
+Replace the -1 with a 1 keep these features.
+#+BEGIN_SRC emacs-lisp
+(menu-bar-mode -1)
+(toggle-scroll-bar -1)
+(tool-bar-mode -1)
+#+END_SRC
+
+*** Disable bell
+I find this feature annoying, feel free to remove this line if you like the sound of computerized bells
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC
+
+*** Clock
+A clock which shows in the mode line.
+#+BEGIN_SRC emacs-lisp
+(setq display-time-24hr-format t)
+(setq display-time-format "%d %B %Y - %H:%M")
+(display-time-mode 1)
+#+END_SRC
+*** Beacon
+
+Helps user find the line which they are editing when they swap buffer.
+#+BEGIN_SRC
+(use-package beacon
+	:ensure t
+	:config
+		(beacon-mode 1)
+)
+#+END_SRC
+
+*** Powerline (Mode line)
+This is the bar at the very bottom of the emacs window. This contains information relevant to the file that is currently being edited (for instance file name, minor and major modes used, current git branch and so on).
+#+BEGIN_SRC emacs-lisp
+(use-package powerline
+	:ensure t
+	:diminish
+	:init (powerline-center-theme)
+)
+#+END_SRC
+
+*** Neotree
+#+BEGIN_SRC emacs-lisp
+(use-package neotree
+ :ensure t
+	:diminish
+	:commands neotree-toggle neotree-refresh neotree
+	:bind(:map prog-mode-map
+	("C-<tab>" . neotree-toggle)
+)
+)
+#+END_SRC
+*** Customize frame name
+ #+BEGIN_SRC emacs-lisp
+ (setq-default frame-title-format '("Lucinda?"))
+ #+END_SRC
+
+*** Customize font-family and font size
+#+BEGIN_SRC emacs-lisp
+(set-frame-font "Consolas 14" nil t)
+#+END_SRC
+*** Speedbar
+Sr-Speedbar allows for speedbar (class navigator) to be docked in the same window.
+
+#+BEGIN_SRC emacs-lisp
+(use-package sr-speedbar
+:init(with-eval-after-load "speedbar"
+	(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
+)
+)
+;; fix so speedbar is in same window
+
+#+END_SRC
+
+*** 80 char column
+#+BEGIN_SRC emacs-lisp
+(use-package column-enforce-mode
+	:diminish
+	:ensure t
+	:hook (python-mode . column-enforce-mode)
+)
+#+END_SRC
+
+* Functionality
+** Magit
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+	:ensure t
+	:defer t
+	:diminish
+	:bind(:map prog-mode-map
+		("C-c t" . magit-stage-file)
+		("C-c s" . magit-status)
+		("C-c c" . magit-commit-create)
+	)
+)
+
+(use-package vc
+	:no-require t
+	:bind("C-c d" . vd-diff)
+)
+
+(use-package git-gutter
+	:ensure t
+	:diminish
+	:hook (prog-mode . git-gutter-mode)
+	:hook (magit-post-refresh . git-gutter:update-all-windows)
+	:bind(:map prog-mode-map
+		("C-c n" . git-gutter:next-hunk)
+ 		("C-c p" . git-gutter:previous-hunk)
+)
+)
+#+END_SRC
+** UTF-8
+This is very important as sometimes you might encounter some different kinds of characters in the the package list which will start throwing annoying errors.
+#+BEGIN_SRC emacs-lisp
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+;; backwards compatibility as default-buffer-file-coding-system
+;; is deprecated in 23.2.
+(if (boundp 'buffer-file-coding-system)
+	(setq-default buffer-file-coding-system 'utf-8)
+	(setq default-buffer-file-coding-system 'utf-8))
+
+;; Treat clipboard input as UTF-8 string first; compound text next, etc.
+(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+#+END_SRC
+** Backups
+Although backups are recommended, I don't like how they're implemented (it litters any directory you work in).
+#+BEGIN_SRC emacs-lisp
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+#+END_SRC
+** Change yes/no prompts to y/n
+Normally when the user is prompted to give a yes or no answer, they will have to type out the "yes" or "no" in its entirety. This option changed it to just a "y" for yes and a "n" no (I mean we're using EMACS, might as well save all the key strokes you can ;) )
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+** Dashboard
+This is what the user first encounters when they start up EMACS (an example of the dashboard can be seen in the screenshot above)
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+:ensure t
+:config(setq dashboard-startup-banner "~/.emacs.d/download.png")
+(setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
+(setq dashboard-items '((recents  . 3)
+                        (bookmarks . 3)
+                        (projects . 5)
+                        (agenda . 0)
+                        (registers . 0)))
+(dashboard-setup-startup-hook)
+)
+#+END_SRC
+** Line wrapping
+#+BEGIN_SRC emacs-lisp
+(global-visual-line-mode)
+#+END_SRC
+** Flyspell-lazy
+I have found that using flyspell adds lag and input delay whenever a key stroke is pressed. This helps alleviate this issue by spell checking less often. Alternatively one may use flyspell buffer and check the buffer once a while whenever they deem it to be fit but this does the job automatically.
+#+BEGIN_SRC emacs-lisp
+(use-package flyspell-lazy
+	:ensure t
+	:diminish
+	:defer t
+)
+#+END_SRC
+** Which-key
+This is a god send for beginners and novices alike. In short, this allows the user to see what key bindings they can use on the fly.
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+	:ensure t
+	:diminish
+	:config (which-key-mode)
+)
+#+END_SRC
+
+** ISpell Setup
+In order for ISpell and flycheck to work, a recent version of hunspell needs to be used.
+#+BEGIN_SRC emacs-lisp
+(use-package ispell
+	:no-require t
+	:custom
+	(ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
+	(ispell-local-dictionary "en_US")
+	(ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+	:bind ("C-<return>" . ispell-word)
+)
+
+#+END_SRC
+
+** Dictionary
+#+BEGIN_SRC emacs-lisp
+(use-package define-word
+	:diminish
+	:ensure t
+	:defer t
+)
+#+END_SRC
+** helm-ag
+=helm-ag= is used to search all of the files in a project.
+#+BEGIN_SRC emacs-lisp
+(use-package helm-ag
+	:ensure t
+	:diminish
+	:bind("C-M-s" . helm-ag)
+)
+#+END_SRC
+** anzu
+=anzu= will be used to replace words in on the cursor
+#+BEGIN_SRC emacs-lisp
+(use-package anzu
+	:diminish
+	:ensure t
+	:bind
+	("M-r" . anzu-query-replace-at-cursor)
+)
+#+END_SRC
+** Unbind certain keys
+#+BEGIN_SRC emacs-lisp
+(global-unset-key "\C-z")
+(global-unset-key "\C-x\C-z")
+(global-unset-key "\C-x\C-c")
+#+END_SRC
+* Org Mode
+#+BEGIN_SRC emacs-lisp
+(use-package org
+	:mode("\\.org\\'" . org-mode)
+	:custom
+	(org-startup-with-inline-images nil)
+	(org-latex-image-default-width "8cm")
+	(org-latex-image-default-height "8cm")
+	(org-latex-images-centered t)
+	(org-latex-pdf-process
+		'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+	(org-latex-toc-command "\\tableofcontents \\clearpage")
+)
+#+END_SRC
+
+* Programming
+**  Python Mode
+#+BEGIN_SRC emacs-lisp
+(use-package python
+	:mode("\\.py\\'")
+)
+
+  (use-package virtualenvwrapper
+	  :ensure t
+	  :hook (python-mode . venv-initialize-interactive-shells)
+	  :hook (python-mode . venv-initialize-eshell)
+  )
+
+  (use-package flycheck
+	  :ensure t
+	  :commands (flycheck-mode
+	    flycheck-next-error
+	    flycheck-previous-error)
+	  :diminish
+	  :hook(python-mode . flycheck-mode)
+  )
+
+  (use-package blacken
+	  :ensure t
+	  :diminish
+	  :defer t
+  )
+
+  (use-package pylint
+	  :ensure t
+	  :diminish
+	  :defer t
+  )
+
+  (use-package jedi
+	  :ensure t
+	  :hook(python-mode . jedi:setup)
+  )
+
+  (setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
+#+END_SRC
+**  Java Mode
+#+BEGIN_SRC emacs-lisp
+(defun create-java-project (project-name group-id)
+	"Creates a java project with the necessary directory structure"
+	(interactive "sProject Name:\nsGroup ID:")
+	(shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
+)
+
+(use-package jdee
+	:ensure t
+	:diminish
+	:defer t
+	:bind
+	(:map jdee-mode-map
+	("<f1>" . jdee-debug)
+	("<f2>" . jdee-debug-set-breakpoint)
+	("<f3>" . jdee-debug-step-into)
+	("<f4>" . jdee-debug-cont)
+	("<f6>" . jdee-maven-build)
+)
+	:custom(jdee-server-dir "~/.emacs.d/jdee-jar")
+)
+#+END_SRC
+
+** HTML
+#+BEGIN_SRC emacs-lisp
+(use-package web-mode
+	:ensure t
+	:mode("\\.html\\'")
+	:bind(:map web-mode-map
+	("C-c C-e -" . web-mode-element-contract)
+	("C-c C-e +" . web-mode-element-extract)
+	("C-c C-e /" . web-mode-element-close)
+	("C-c C-e a" . web-mode-element-content-select)
+	("C-c C-e i" . web-mode-element-insert)
+	("C-c C-e w" . web-mode-element-wrap)
+	("C-c C-e k" . web-mode-element-kill)
+)
+)
+
+(use-package css-mode
+	:ensure t
+	:mode("\\.css\\'")
+)
+
+(use-package impatient-mode
+	:ensure t
+	:after simple-httpd
+	:hook((web-mode css-mode) . impatient-mode)
+)
+
+(use-package zencoding-mode
+	:ensure t
+	:diminish
+	:hook(web-mode . zenconding-mode)
+	:bind(:map web-mode-map("C-`" . zencoding-expand-line))
+)
+
+(use-package web-beautify
+	:ensure t
+	:diminish
+	:defer t
+)
+#+END_SRC
+** Yasnippet setup
+To create snippets, just write it out on any buffer and leave a '~' right behind the placeholder. Then highlight the region and use the command =aya-create=. Use =aya-persist-snippet= to save the created snippet.
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet
+	:ensure t
+	:hook(prog-mode . yas-global-mode)
+	:bind*("C-~" . yas-insert-snippet)
+	:config
+	(yas-reload-all)
+	(use-package yasnippet-snippets
+		:ensure t
+	)
+)
+
+(use-package auto-yasnippet
+	:ensure t
+	:after yasnippet
+	:commands(aya-create aya-expand aya-open-line)
+	:diminish
+)
+#+END_SRC
+** Smart Compile
+#+BEGIN_SRC emacs-lisp
+(use-package smart-compile
+	:ensure t
+	:diminish
+	:bind (:map prog-mode-map
+	("C-c C-c" . smart-compile))
+)
+#+END_SRC
+* Key Bindings
+** Ace Window
+=M-o= swaps window.
+   #+BEGIN_SRC emacs-lisp
+(use-package ace-window
+	:ensure t
+	:diminish
+	:commands ace-window
+	:bind("M-o" . ace-window)
+)
+   #+END_SRC
+** Multi Cursors
+Multicursor down: =C->= Multicursor up : =C-<=
+#+BEGIN_SRC emacs-lisp
+(use-package multiple-cursors
+	:ensure t
+	:commands (mc/mark-next-like-this mc/mark-previous-like-this)
+	:diminish 
+	:bind
+	("C->" . mc/mark-next-like-this)
+	("C-<" . mc/mark-previous-like-this)
+)
+
+(use-package ace-mc
+	:ensure t
+	:commands (ace-mc-add-multiple-cursors)
+	:diminish
+	:bind
+	("C-M->" . ace-mc-add-multiple-cursors)
+	("C-M-<" . ace-mc-add-multiple-cursors)
+)
+
+#+END_SRC
+
+** Resizing Window
+=S-C-<left>=: shrink horizontally. =S-C-<right>=: enlarge horizontally. =S-C-<down>=: shrink vertically. =S-C-<up>=: enlarge vertically.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "S-C-<down>") 'shrink-window)
+(global-set-key (kbd "S-C-<up>") 'enlarge-window)
+#+END_SRC
+** Helm
+To search for code there are two options. There is either helm swoop (M-s, C-x a s to search all buffers) and helm occur(C-s). M-y for the kill ring, C-x r m is to traverse through bookmarks and C-x C-f to find files.
+#+BEGIN_SRC emacs-lisp
+(use-package helm
+	:ensure t
+	:diminish
+	:bind
+	("M-s" . helm-occur)
+	("M-y" . helm-show-kill-ring)
+	("C-x r m" . helm-bookmarks)
+	("C-x C-b" . helm-buffers-list)
+	("C-x C-f" . helm-find-files)
+)
+#+END_SRC
+** Ace Jump Mode
+C-x C-M-s to jump through text on the current screen.
+#+BEGIN_SRC emacs-lisp
+(use-package ace-jump-mode
+	:ensure t
+	:bind
+	("C-z" . ace-jump-mode)
+	("M-z" . ace-jump-mode-pop-mark)
+)
+#+END_SRC
+** Misc.
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-M-g") 'query-replace-regexp)
+(use-package smex
+	:ensure t
+	:diminish
+	:bind("M-x" . smex)
+)
+
+(use-package isearch
+	:no-require t
+	:bind(("C-s" . isearch-forward)
+	("C-r" . isearch-backward))
+)
+
+(global-set-key (kbd "C-|") 'comment-box)
+(global-set-key (kbd "C-M-|") 'uncomment-region)
+#+END_SRC
+* Defers
+#+BEGIN_SRC emacs-lisp
+(use-package tramp :defer t)
+(use-package with-editor :defer t)
+(use-package org-agenda :defer t)
+(use-package speedbar :defer t)
+(use-package gud :defer t)
+#+END_SRC
+* Post initialization
+Lowering the GC thresholds back to a sane level.
+#+BEGIN_SRC emacs-lisp
+(setq gc-cons-threshold 16777216
+      gc-cons-percentage 0.1)
+#+END_SRC

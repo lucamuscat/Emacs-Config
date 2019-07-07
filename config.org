@@ -91,7 +91,6 @@ A clock which shows in the mode line.
 (display-time-mode 1)
 #+END_SRC
 *** Beacon
-
 Helps user find the line which they are editing when they swap buffer.
 #+BEGIN_SRC
 (use-package beacon
@@ -136,23 +135,14 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 
 #+BEGIN_SRC emacs-lisp
 (use-package sr-speedbar
-:init(with-eval-after-load "speedbar"
-	(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
-)
+	:defer t
+	:config(with-eval-after-load "speedbar"
+		(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
+	)
 )
 ;; fix so speedbar is in same window
 
 #+END_SRC
-
-*** 80 char column
-#+BEGIN_SRC emacs-lisp
-(use-package column-enforce-mode
-	:diminish
-	:ensure t
-	:hook (python-mode . column-enforce-mode)
-)
-#+END_SRC
-
 * Functionality
 ** Magit
 #+BEGIN_SRC emacs-lisp
@@ -169,7 +159,7 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 
 (use-package vc
 	:no-require t
-	:bind("C-c d" . vd-diff)
+	:bind("C-c d" . vc-diff)
 )
 
 (use-package git-gutter
@@ -258,7 +248,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	(ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
 	(ispell-local-dictionary "en_US")
 	(ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
-	:bind ("C-<return>" . ispell-word)
+	:bind (:map org-mode-map("C-<return>" . ispell-word))
 )
 
 #+END_SRC
@@ -312,47 +302,46 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 #+END_SRC
 
 * Programming
-**  Python Mode
+** Python Mode
 #+BEGIN_SRC emacs-lisp
 (use-package python
 	:mode("\\.py\\'")
+	:custom(python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 )
 
-  (use-package virtualenvwrapper
-	  :ensure t
-	  :hook (python-mode . venv-initialize-interactive-shells)
-	  :hook (python-mode . venv-initialize-eshell)
-  )
+(use-package virtualenvwrapper
+	:ensure t
+	:hook (python-mode . venv-initialize-interactive-shells)
+	:hook (python-mode . venv-initialize-eshell)
+)
 
-  (use-package flycheck
-	  :ensure t
-	  :commands (flycheck-mode
-	    flycheck-next-error
-	    flycheck-previous-error)
-	  :diminish
-	  :hook(python-mode . flycheck-mode)
-  )
+(use-package flycheck
+	:ensure t
+	:commands (flycheck-mode
+	  flycheck-next-error
+	  flycheck-previous-error)
+	:diminish
+	:hook(python-mode . flycheck-mode)
+)
 
-  (use-package blacken
-	  :ensure t
-	  :diminish
-	  :defer t
-  )
+(use-package blacken
+	:ensure t
+	:diminish
+	:defer t
+)
 
-  (use-package pylint
-	  :ensure t
-	  :diminish
-	  :defer t
-  )
+(use-package pylint
+	:ensure t
+	:diminish
+	:defer t
+)
 
-  (use-package jedi
-	  :ensure t
-	  :hook(python-mode . jedi:setup)
-  )
-
-  (setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
+(use-package jedi
+	:ensure t
+	:hook(python-mode . jedi:setup)
+)
 #+END_SRC
-**  Java Mode
+** Java Mode
 #+BEGIN_SRC emacs-lisp
 (defun create-java-project (project-name group-id)
 	"Creates a java project with the necessary directory structure"
@@ -366,12 +355,12 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	:defer t
 	:bind
 	(:map jdee-mode-map
-	("<f1>" . jdee-debug)
-	("<f2>" . jdee-debug-set-breakpoint)
-	("<f3>" . jdee-debug-step-into)
-	("<f4>" . jdee-debug-cont)
-	("<f6>" . jdee-maven-build)
-)
+		("<f1>" . jdee-debug)
+		("<f2>" . jdee-debug-set-breakpoint)
+		("<f3>" . jdee-debug-step-into)
+		("<f4>" . jdee-debug-cont)
+		("<f6>" . jdee-maven-build)
+	)
 	:custom(jdee-server-dir "~/.emacs.d/jdee-jar")
 )
 #+END_SRC
@@ -397,16 +386,23 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	:mode("\\.css\\'")
 )
 
+(use-package simple-httpd
+	:no-require t
+	:after web-mode
+	:ensure t
+	:diminish
+	:hook(web-mode . httpd-start)
+)
+
 (use-package impatient-mode
 	:ensure t
-	:after simple-httpd
 	:hook((web-mode css-mode) . impatient-mode)
 )
 
 (use-package zencoding-mode
 	:ensure t
 	:diminish
-	:hook(web-mode . zenconding-mode)
+	:hook(web-mode . zencoding-mode)
 	:bind(:map web-mode-map("C-`" . zencoding-expand-line))
 )
 
@@ -449,21 +445,21 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 * Key Bindings
 ** Ace Window
 =M-o= swaps window.
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (use-package ace-window
 	:ensure t
 	:diminish
 	:commands ace-window
 	:bind("M-o" . ace-window)
 )
-   #+END_SRC
+#+END_SRC
 ** Multi Cursors
 Multicursor down: =C->= Multicursor up : =C-<=
 #+BEGIN_SRC emacs-lisp
 (use-package multiple-cursors
 	:ensure t
 	:commands (mc/mark-next-like-this mc/mark-previous-like-this)
-	:diminish 
+	:diminish
 	:bind
 	("C->" . mc/mark-next-like-this)
 	("C-<" . mc/mark-previous-like-this)
@@ -495,7 +491,7 @@ To search for code there are two options. There is either helm swoop (M-s, C-x a
 	:ensure t
 	:diminish
 	:bind
-	("M-s" . helm-occur)
+	("C-s" . helm-occur)
 	("M-y" . helm-show-kill-ring)
 	("C-x r m" . helm-bookmarks)
 	("C-x C-b" . helm-buffers-list)
@@ -512,7 +508,8 @@ C-x C-M-s to jump through text on the current screen.
 	("M-z" . ace-jump-mode-pop-mark)
 )
 #+END_SRC
-** Misc.
+** Smex
+Smex incorporates fuzzy finding into M-x, making working in EMACS require much less memory work.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-M-g") 'query-replace-regexp)
 (use-package smex
@@ -520,12 +517,28 @@ C-x C-M-s to jump through text on the current screen.
 	:diminish
 	:bind("M-x" . smex)
 )
+#+END_SRC
 
+** Delete Trailing Whitespace on Save
+As the header states, this will call the =delete-trailing-whitespace= function whenever a save occurs.
+#+BEGIN_SRC emacs-lisp
+(use-package simple
+	:no-require t
+	:hook(before-save . delete-trailing-whitespace)
+)
+
+#+END_SRC
+
+** ISearch
+#+BEGIN_SRC emacs-lisp
 (use-package isearch
 	:no-require t
-	:bind(("C-s" . isearch-forward)
-	("C-r" . isearch-backward))
+	:bind
+	("M-s" . isearch-forward)
+	("M-r" . isearch-backward)
 )
+
+#+END_SRC
 
 (global-set-key (kbd "C-|") 'comment-box)
 (global-set-key (kbd "C-M-|") 'uncomment-region)
@@ -537,6 +550,7 @@ C-x C-M-s to jump through text on the current screen.
 (use-package org-agenda :defer t)
 (use-package speedbar :defer t)
 (use-package gud :defer t)
+(use-package all-the-icons :defer t)
 #+END_SRC
 * Post initialization
 Lowering the GC thresholds back to a sane level.

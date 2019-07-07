@@ -25,7 +25,7 @@
 (use-package doom-themes
 	:diminish
 	:ensure t
-	:config (load-theme 'doom-one t)
+	:config (load-theme 'doom-city-lights t)
 )
 
 (setq inhibit-splash-screen t
@@ -33,7 +33,6 @@ initial-buffer-choice  nil
 )
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-(add-hook 'sgml-mode-hook 'display-line-numbers-mode)
 
 (menu-bar-mode -1)
 (toggle-scroll-bar -1)
@@ -65,41 +64,38 @@ initial-buffer-choice  nil
 (set-frame-font "Consolas 14" nil t)
 
 (use-package sr-speedbar
-:init(with-eval-after-load "speedbar"
-	(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
-)
+	:defer t
+	:config(with-eval-after-load "speedbar"
+		(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
+	)
 )
 ;; fix so speedbar is in same window
-
-(use-package column-enforce-mode
-	:diminish
-	:ensure t
-	:hook (python-mode . column-enforce-mode)
-)
 
 (use-package magit
 	:ensure t
 	:defer t
 	:diminish
 	:bind(:map prog-mode-map
-		("C-c u" . magit-diff-unstaged)
-		("C-c a" . magit-stage-file)
+		("C-c t" . magit-stage-file)
 		("C-c s" . magit-status)
 		("C-c c" . magit-commit-create)
 	)
 )
-
-(use-package git-gutter
-	:ensure t
-	:diminish
-	:hook (prog-mode . git-gutter-mode)
-	:hook (magit-post-refresh . git-gutter:update-all-windows)
-	:bind(:map prog-mode-map
-		("C-x n" . git-gutter:next-hunk)
- 		("C-x p" . git-gutter:previous-hunk)
-		("C-x m" . git-gutter:mark-hunk)
-		("C-x t" . git-gutter:stage-hunk)
-)
+
+(use-package vc
+	:no-require t
+	:bind("C-c d" . vc-diff)
+)
+
+(use-package git-gutter
+	:ensure t
+	:diminish
+	:hook (prog-mode . git-gutter-mode)
+	:hook (magit-post-refresh . git-gutter:update-all-windows)
+	:bind(:map prog-mode-map
+		("C-c n" . git-gutter:next-hunk)
+ 		("C-c p" . git-gutter:previous-hunk)
+)
 )
 
 (prefer-coding-system 'utf-8)
@@ -142,6 +138,7 @@ initial-buffer-choice  nil
 
 (use-package which-key
 	:ensure t
+	:diminish
 	:config (which-key-mode)
 )
 
@@ -151,7 +148,7 @@ initial-buffer-choice  nil
 	(ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
 	(ispell-local-dictionary "en_US")
 	(ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
-	:bind ("C-<return>" . ispell-word)
+	:bind (:map org-mode-map("C-<return>" . ispell-word))
 )
 
 (use-package define-word
@@ -162,6 +159,7 @@ initial-buffer-choice  nil
 
 (use-package helm-ag
 	:ensure t
+	:diminish
 	:bind("C-M-s" . helm-ag)
 )
 
@@ -170,22 +168,28 @@ initial-buffer-choice  nil
 	:ensure t
 	:bind
 	("M-r" . anzu-query-replace-at-cursor)
-	("C-r" . anzu-query-replace)
 )
 
 (global-unset-key "\C-z")
 (global-unset-key "\C-x\C-z")
 (global-unset-key "\C-x\C-c")
 
-(setq org-startup-with-inline-images nil)
+(use-package org
+	:mode("\\.org\\'" . org-mode)
+	:custom
+	(org-startup-with-inline-images nil)
+	(org-latex-image-default-width "8cm")
+	(org-latex-image-default-height "8cm")
+	(org-latex-images-centered t)
+	(org-latex-pdf-process
+		'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+	(org-latex-toc-command "\\tableofcontents \\clearpage")
+)
 
-(setq org-latex-image-default-width "8cm")
-(setq org-latex-image-default-height "8cm")
-(setq org-latex-images-centered t)
-
-(setq org-latex-toc-command "\\tableofcontents \\clearpage")
-
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+(use-package python
+	:mode("\\.py\\'")
+	:custom(python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
+)
 
 (use-package virtualenvwrapper
 	:ensure t
@@ -219,31 +223,26 @@ initial-buffer-choice  nil
 	:hook(python-mode . jedi:setup)
 )
 
-(setq python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
-
 (defun create-java-project (project-name group-id)
 	"Creates a java project with the necessary directory structure"
 	(interactive "sProject Name:\nsGroup ID:")
 	(shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
 )
 
-(setq jdee-server-dir "~/.emacs.d/jdee-jar")
-
-(add-hook 'java-mode-hook (lambda()
-	(local-set-key (kbd "<f1>") 'jdee-debug)
-	(local-set-key (kbd "<f2>") 'jdee-debug-set-breakpoint)
-	(local-set-key (kbd "<f3>") 'jdee-debug-step-into)
-	(local-set-key (kbd "<f4>") 'jdee-debug-cont)
-	(local-set-key (kbd "<f6>") 'jdee-maven-build)
-))
-
 (use-package jdee
 	:ensure t
 	:diminish
 	:defer t
+	:bind
+	(:map jdee-mode-map
+		("<f1>" . jdee-debug)
+		("<f2>" . jdee-debug-set-breakpoint)
+		("<f3>" . jdee-debug-step-into)
+		("<f4>" . jdee-debug-cont)
+		("<f6>" . jdee-maven-build)
+	)
+	:custom(jdee-server-dir "~/.emacs.d/jdee-jar")
 )
-
-(add-to-list 'auto-mode-alist '("\\.html\\'" . html-mode))
 
 (use-package web-mode
 	:ensure t
@@ -259,21 +258,28 @@ initial-buffer-choice  nil
 )
 )
 
-(use-package xah-css-mode
+(use-package css-mode
 	:ensure t
 	:mode("\\.css\\'")
 )
 
+(use-package simple-httpd
+	:no-require t
+	:after web-mode
+	:ensure t
+	:diminish
+	:hook(web-mode . httpd-start)
+)
+
 (use-package impatient-mode
 	:ensure t
-	:after simple-httpd
-	:hook((web-mode xah-css-mode) . impatient-mode)
+	:hook((web-mode css-mode) . impatient-mode)
 )
 
 (use-package zencoding-mode
 	:ensure t
 	:diminish
-	:hook(html-mode . zenconding-mode)
+	:hook(web-mode . zencoding-mode)
 	:bind(:map web-mode-map("C-`" . zencoding-expand-line))
 )
 
@@ -318,7 +324,7 @@ initial-buffer-choice  nil
 (use-package multiple-cursors
 	:ensure t
 	:commands (mc/mark-next-like-this mc/mark-previous-like-this)
-	:diminish 
+	:diminish
 	:bind
 	("C->" . mc/mark-next-like-this)
 	("C-<" . mc/mark-previous-like-this)
@@ -363,20 +369,24 @@ initial-buffer-choice  nil
 	:bind("M-x" . smex)
 )
 
-(use-package isearch
+(use-package simple
 	:no-require t
-	:bind(("M-s" . isearch-forward)
-	("M-r" . isearch-backward))
+	:hook(before-save . delete-trailing-whitespace)
 )
 
-(global-set-key (kbd "C-|") 'comment-box)
-(global-set-key (kbd "C-M-|") 'uncomment-region)
+(use-package isearch
+	:no-require t
+	:bind
+	("M-s" . isearch-forward)
+	("M-r" . isearch-backward)
+)
 
 (use-package tramp :defer t)
 (use-package with-editor :defer t)
 (use-package org-agenda :defer t)
 (use-package speedbar :defer t)
 (use-package gud :defer t)
+(use-package all-the-icons :defer t)
 
 (setq gc-cons-threshold 16777216
       gc-cons-percentage 0.1)

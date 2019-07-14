@@ -159,6 +159,7 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 
 (use-package vc
 	:no-require t
+	:commands(vc diff)
 	:bind("C-c d" . vc-diff)
 )
 
@@ -302,10 +303,19 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 #+END_SRC
 
 * Programming
+** Company
+#+BEGIN_SRC emacs-lisp
+(use-package company
+	:ensure t
+	:diminish
+	:hook((web-mode css-mode) . company-mode)
+	:custom(comany-idle-delay 0.3)
+)
+#+END_SRC
 ** Python Mode
 #+BEGIN_SRC emacs-lisp
 (use-package python
-	:mode("\\.py\\'")
+	:mode("\\.py\\'" . python-mode)
 	:custom(python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 )
 
@@ -322,6 +332,13 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	  flycheck-previous-error)
 	:diminish
 	:hook(python-mode . flycheck-mode)
+)
+
+(use-package smart-compile
+	:ensure t
+	:bind(:map python-mode-map
+		("C-c C-c" . smart-compile)
+	)
 )
 
 (use-package blacken
@@ -370,6 +387,7 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (use-package web-mode
 	:ensure t
 	:mode("\\.html\\'")
+	:config(web-mode-toggle-current-element-highlight)
 	:bind(:map web-mode-map
 	("C-c C-e -" . web-mode-element-contract)
 	("C-c C-e +" . web-mode-element-extract)
@@ -384,6 +402,11 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 (use-package css-mode
 	:ensure t
 	:mode("\\.css\\'")
+)
+
+(use-package css-comb
+	:ensure t
+	:commands (css-comb)
 )
 
 (use-package simple-httpd

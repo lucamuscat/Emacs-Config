@@ -442,6 +442,14 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 	("C-c C-c" . smart-compile))
 )
 #+END_SRC
+** So-long
+This helps mitigate the slowness which comes with opening large files in emacs.
+#+BEGIN_SRC emacs-lisp
+(use-package so-long
+	:load-path("~/.emacs.d/elpa/so-long.el")
+	:init(global-so-long-mode)
+)
+#+END_SRC
 * Key Bindings
 ** Ace Window
 =M-o= swaps window.

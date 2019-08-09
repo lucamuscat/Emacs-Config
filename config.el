@@ -19,6 +19,7 @@
 (setq initial-major-mode (quote fundamental-mode))
 
 (use-package benchmark-init
+:ensure t
 :init(benchmark-init/activate)
 )
 
@@ -62,6 +63,15 @@ initial-buffer-choice  nil
 	)
 )
 ;; fix so speedbar is in same window
+
+(use-package helm-posframe
+	:ensure t
+	:init(helm-posframe-enable)
+	:custom(helm-posframe-parameters '(
+	(left-fringe . 10)
+	(right-fringe . 10)
+))
+)
 
 (use-package magit
 	:ensure t
@@ -210,7 +220,6 @@ initial-buffer-choice  nil
 
 (use-package python
 	:mode("\\.py\\'" . python-mode)
-	:custom(python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 )
 
 (use-package virtualenvwrapper
@@ -260,7 +269,7 @@ initial-buffer-choice  nil
 
 (use-package jdee
 	:diminish
-	:defer t
+	:mode("\\.java\\'" . jdee-mode)
 	:bind
 	(:map jdee-mode-map
 		("<f1>" . jdee-debug)
@@ -349,7 +358,8 @@ initial-buffer-choice  nil
 )
 
 (use-package so-long
-	:load-path("~/.emacs.d/elpa/so-long.el")
+	:load-path("~/.emacs.d/elpa/")
+	:commands global-so-long-mode
 	:init(global-so-long-mode)
 )
 

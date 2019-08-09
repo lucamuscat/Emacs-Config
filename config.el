@@ -64,15 +64,6 @@ initial-buffer-choice  nil
 )
 ;; fix so speedbar is in same window
 
-(use-package helm-posframe
-	:ensure t
-	:init(helm-posframe-enable)
-	:custom(helm-posframe-parameters '(
-	(left-fringe . 10)
-	(right-fringe . 10)
-))
-)
-
 (use-package magit
 	:ensure t
 	:defer t
@@ -150,10 +141,6 @@ initial-buffer-choice  nil
 (use-package ispell
 	:no-require t
 	:defer t
-	:custom
-	(ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
-	(ispell-local-dictionary "en_US")
-	(ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
 	:bind (:map org-mode-map("C-<return>" . ispell-word))
 )
 

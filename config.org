@@ -41,6 +41,7 @@ By default, the scratch buffer has a =prog-mode= major mode, this means that any
 ** Benchmark
 #+BEGIN_SRC emacs-lisp
 (use-package benchmark-init
+:ensure t
 :init(benchmark-init/activate)
 )
 #+END_SRC
@@ -143,6 +144,7 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 ;; fix so speedbar is in same window
 
 #+END_SRC
+
 * Functionality
 ** Magit
 #+BEGIN_SRC emacs-lisp
@@ -243,15 +245,11 @@ This is a god send for beginners and novices alike. In short, this allows the us
 #+END_SRC
 
 ** ISpell Setup
-In order for ISpell and flycheck to work, a recent version of hunspell needs to be used.
+
 #+BEGIN_SRC emacs-lisp
 (use-package ispell
 	:no-require t
 	:defer t
-	:custom
-	(ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
-	(ispell-local-dictionary "en_US")
-	(ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
 	:bind (:map org-mode-map("C-<return>" . ispell-word))
 )
 
@@ -338,7 +336,6 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 #+BEGIN_SRC emacs-lisp
 (use-package python
 	:mode("\\.py\\'" . python-mode)
-	:custom(python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 )
 
 (use-package virtualenvwrapper
@@ -483,7 +480,8 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 This helps mitigate the slowness which comes with opening large files in emacs.
 #+BEGIN_SRC emacs-lisp
 (use-package so-long
-	:load-path("~/.emacs.d/elpa/so-long.el")
+	:load-path("~/.emacs.d/elpa/")
+	:commands global-so-long-mode
 	:init(global-so-long-mode)
 )
 #+END_SRC

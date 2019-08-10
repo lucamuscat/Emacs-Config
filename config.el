@@ -19,6 +19,7 @@
 (setq initial-major-mode (quote fundamental-mode))
 
 (use-package benchmark-init
+:ensure t
 :init(benchmark-init/activate)
 )
 
@@ -140,10 +141,6 @@ initial-buffer-choice  nil
 (use-package ispell
 	:no-require t
 	:defer t
-	:custom
-	(ispell-program-name "~/.emacs.d/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe")
-	(ispell-local-dictionary "en_US")
-	(ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
 	:bind (:map org-mode-map("C-<return>" . ispell-word))
 )
 
@@ -210,7 +207,6 @@ initial-buffer-choice  nil
 
 (use-package python
 	:mode("\\.py\\'" . python-mode)
-	:custom(python-shell-interpreter "C:/Users/lucam/AppData/Local/Programs/Python/Python37-32/python.exe")
 )
 
 (use-package virtualenvwrapper
@@ -260,7 +256,7 @@ initial-buffer-choice  nil
 
 (use-package jdee
 	:diminish
-	:defer t
+	:mode("\\.java\\'" . jdee-mode)
 	:bind
 	(:map jdee-mode-map
 		("<f1>" . jdee-debug)
@@ -349,7 +345,8 @@ initial-buffer-choice  nil
 )
 
 (use-package so-long
-	:load-path("~/.emacs.d/elpa/so-long.el")
+	:load-path("~/.emacs.d/elpa/")
+	:commands global-so-long-mode
 	:init(global-so-long-mode)
 )
 

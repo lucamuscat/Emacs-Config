@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: 
+# name: toc-lecture
+# key: l
+# --
+** $1 (pg $2-$3)

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: 
+# name: org-boilerplate
+# key: init
+# --
+#+TITLE:$1
+#+AUTHOR:Luca Muscat

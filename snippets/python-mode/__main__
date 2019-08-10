@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: 
+# name: __main__
+# key: __main__ 
+# --
+if __name__ == '__main__':
+   $1

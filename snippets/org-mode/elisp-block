@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# contributor: 
+# name: elisp-block
+# key: elisp
+# --
+#+BEGIN_SRC emacs-lisp
+$1
+#+END_SRC

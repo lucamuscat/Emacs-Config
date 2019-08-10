@@ -46,11 +46,13 @@ By default, the scratch buffer has a =prog-mode= major mode, this means that any
 #+END_SRC
 * Theme
 #+BEGIN_SRC emacs-lisp
+
 (use-package doom-themes
 	:diminish
 	:ensure t
 	:config (load-theme 'doom-city-lights t)
 )
+
 #+END_SRC
 * Interface Settings
 These are built-in UI enhancements.
@@ -112,19 +114,28 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 
 *** Customize frame name
  #+BEGIN_SRC emacs-lisp
- (setq-default frame-title-format '("Lucinda?"))
+ (setq-default
+ frame-title-format '("Lucinda?"))
  #+END_SRC
 
 *** Customize font-family and font size
 #+BEGIN_SRC emacs-lisp
 (set-frame-font "Consolas 14" nil t)
 #+END_SRC
+*** Neotree
+#+BEGIN_SRC emacs-lisp
+(use-package neotree
+	:ensure t
+	:diminish
+	:bind("C-<tab>" . neotree-toggle)
+)
+#+END_SRC
 *** Speedbar
-Sr-Speedbar allows for speedbar (class navigator) to be docked in the same window.
+    Sr-Speedbar allows for speedbar (class navigator) to be docked in the same window.
 #+BEGIN_SRC emacs-lisp
 (use-package sr-speedbar
 	:ensure t
-	:bind("C-<tab>" . sr-speedbar-toggle)
+	:defer t
 	:config(with-eval-after-load "speedbar"
 		(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
 	)
@@ -139,6 +150,7 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 	:ensure t
 	:defer t
 	:diminish
+	:commands(magit-stage-file magit-status magit-commit-create)
 	:bind(:map prog-mode-map
 		("C-c t" . magit-stage-file)
 		("C-c s" . magit-status)
@@ -156,7 +168,6 @@ Sr-Speedbar allows for speedbar (class navigator) to be docked in the same windo
 (use-package git-gutter
 	:ensure t
 	:diminish
-	:defer t
 	:hook (prog-mode . git-gutter-mode)
 	:hook (magit-post-refresh . git-gutter:update-all-windows)
 	:bind(:map prog-mode-map
@@ -228,7 +239,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:ensure t
 	:diminish
 	:config (which-key-mode)
-)
+	)
 #+END_SRC
 
 ** ISpell Setup
@@ -263,15 +274,14 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	:bind("C-M-s" . helm-ag)
 )
 #+END_SRC
-** anzu
-=anzu= will be used to replace words in on the cursor
+** Downloading songs off youtube
 #+BEGIN_SRC emacs-lisp
-(use-package anzu
-	:diminish
-	:ensure t
-	:bind
-	("M-r" . anzu-query-replace-at-cursor)
-)
+  ;; (defun youtube-to-mp3 (song-url)
+  ;; 	"Downloads a song off youtube in mp3 format"
+  ;; 	(interactive "sSong url: ")
+  ;; 	(shell-command (format "youtube-dl -x --audio-format mp3 %s" song-url))
+  ;; )
+
 #+END_SRC
 ** Unbind certain keys
 #+BEGIN_SRC emacs-lisp
@@ -292,6 +302,12 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 		'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 	(org-latex-toc-command "\\tableofcontents \\clearpage")
 )
+
+(use-package ox-twbs
+	:ensure t
+	:after org-mode
+)
+
 #+END_SRC
 
 * Programming
@@ -310,22 +326,12 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 	:after company
 )
 
-(use-package company-irony
+(use-package company-jedi
 	:ensure t
 	:diminish
 	:after company
 )
-#+END_SRC
 
-** CLang
-
-#+BEGIN_SRC emacs-lisp
-(use-package irony
-	:ensure t
-	:diminish
-	:hook(c-mode . irony-mode)
-	:custom(w32-pipe-read-delay 50)
-)
 #+END_SRC
 
 ** Python Mode
@@ -337,8 +343,8 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 
 (use-package virtualenvwrapper
 	:ensure t
-	:hook (python-mode . venv-initialize-interactive-shells)
-	:hook (python-mode . venv-initialize-eshell)
+	:init (venv-initialize-interactive-shells)
+	(venv-initialize-eshell)
 )
 
 (use-package flycheck
@@ -383,18 +389,11 @@ In order for ISpell and flycheck to work, a recent version of hunspell needs to 
 )
 
 (use-package jdee
-	:diminish
-	:mode("\\.java\\'" . jdee-mode)
-	:bind
-	(:map jdee-mode-map
-		("<f1>" . jdee-debug)
-		("<f2>" . jdee-debug-set-breakpoint)
-		("<f3>" . jdee-debug-step-into)
-		("<f4>" . jdee-debug-cont)
-		("<f6>" . jdee-maven-build)
-	)
-	:custom(jdee-server-dir "~/.emacs.d/jdee-jar")
+	:ensure t
+	:defer t
+	:custom(jdee-server-dir "~/.emacs.d/jdee-jar/")
 )
+
 #+END_SRC
 
 ** HTML
@@ -597,6 +596,11 @@ As the header states, this will call the =delete-trailing-whitespace= function w
 (use-package speedbar :defer t)
 (use-package gud :defer t)
 (use-package all-the-icons :defer t)
+(use-package latex-extra :defer t)
+(use-package realgud :defer t)
+(use-package smartscan :defer t)
+
+
 #+END_SRC
 * Post initialization
 Lowering the GC thresholds back to a sane level.

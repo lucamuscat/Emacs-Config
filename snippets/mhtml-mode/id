@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: 
+# name: id
+# key: #
+# --
+<div id = "$1"></div>

@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# contributor: 
+# name: interactiveswap
+# key: swap
+# --
+
+int temp = $1;
+$1 = $2;
+$2 = temp;

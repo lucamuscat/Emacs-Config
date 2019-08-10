@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: 
+# name: swap
+# key: swap
+# --
+$1, $2 = $2, $1

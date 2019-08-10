@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: 
+# name: rgb
+# key: rgb
+# --
+color: rgb($1, $2, $3);

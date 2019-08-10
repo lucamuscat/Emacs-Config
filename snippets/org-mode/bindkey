@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: 
+# name: bindkey
+# key: bindkey
+# --
+(local-set-key (kbd "$1") '$2)

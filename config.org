@@ -41,9 +41,8 @@ By default, the scratch buffer has a =prog-mode= major mode, this means that any
 ** Benchmark
 #+BEGIN_SRC emacs-lisp
 (use-package benchmark-init
-:ensure t
-:init(benchmark-init/activate)
-)
+  :ensure t
+  :init(benchmark-init/activate))
 #+END_SRC
 * Theme
 #+BEGIN_SRC emacs-lisp
@@ -131,20 +130,6 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 	:bind("C-<tab>" . neotree-toggle)
 )
 #+END_SRC
-*** Speedbar
-    Sr-Speedbar allows for speedbar (class navigator) to be docked in the same window.
-#+BEGIN_SRC emacs-lisp
-(use-package sr-speedbar
-	:ensure t
-	:defer t
-	:config(with-eval-after-load "speedbar"
-		(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
-	)
-)
-;; fix so speedbar is in same window
-
-#+END_SRC
-
 * Functionality
 ** Magit
 #+BEGIN_SRC emacs-lisp
@@ -206,33 +191,9 @@ Normally when the user is prompted to give a yes or no answer, they will have to
 (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
-** Dashboard
-This is what the user first encounters when they start up EMACS (an example of the dashboard can be seen in the screenshot above)
-#+BEGIN_SRC emacs-lisp
-(use-package dashboard
-:ensure t
-:config(setq dashboard-startup-banner "~/.emacs.d/download.png")
-(setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
-(setq dashboard-items '((recents  . 3)
-                        (bookmarks . 3)
-                        (projects . 5)
-                        (agenda . 0)
-                        (registers . 0)))
-(dashboard-setup-startup-hook)
-)
-#+END_SRC
 ** Line wrapping
 #+BEGIN_SRC emacs-lisp
 (global-visual-line-mode)
-#+END_SRC
-** Flyspell-lazy
-I have found that using flyspell adds lag and input delay whenever a key stroke is pressed. This helps alleviate this issue by spell checking less often. Alternatively one may use flyspell buffer and check the buffer once a while whenever they deem it to be fit but this does the job automatically.
-#+BEGIN_SRC emacs-lisp
-(use-package flyspell-lazy
-	:ensure t
-	:diminish
-	:defer t
-)
 #+END_SRC
 ** Which-key
 This is a god send for beginners and novices alike. In short, this allows the user to see what key bindings they can use on the fly.
@@ -303,7 +264,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 
 (use-package ox-twbs
 	:ensure t
-	:after org-mode
+	:defer t
 )
 
 #+END_SRC
@@ -336,12 +297,6 @@ This is a god send for beginners and novices alike. In short, this allows the us
 #+BEGIN_SRC emacs-lisp
 (use-package python
 	:mode("\\.py\\'" . python-mode)
-)
-
-(use-package virtualenvwrapper
-	:ensure t
-	:init (venv-initialize-interactive-shells)
-	(venv-initialize-eshell)
 )
 
 (use-package flycheck
@@ -417,6 +372,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 
 (use-package css-comb
 	:ensure t
+	:after css-mode
 	:commands (css-comb)
 )
 
@@ -430,6 +386,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 
 (use-package impatient-mode
 	:ensure t
+	:after web-mode
 	:hook((web-mode css-mode) . impatient-mode)
 )
 
@@ -597,8 +554,6 @@ As the header states, this will call the =delete-trailing-whitespace= function w
 (use-package latex-extra :defer t)
 (use-package realgud :defer t)
 (use-package smartscan :defer t)
-
-
 #+END_SRC
 * Post initialization
 Lowering the GC thresholds back to a sane level.

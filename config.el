@@ -19,9 +19,8 @@
 (setq initial-major-mode (quote fundamental-mode))
 
 (use-package benchmark-init
-:ensure t
-:init(benchmark-init/activate)
-)
+  :ensure t
+  :init(benchmark-init/activate))
 
 (use-package doom-themes
 	:diminish
@@ -51,23 +50,22 @@ initial-buffer-choice  nil
 	:init (powerline-center-theme)
 )
 
-(setq-default frame-title-format '("Lucinda?"))
+(setq-default
+frame-title-format '("Lucinda?"))
 
 (set-frame-font "Consolas 14" nil t)
 
-(use-package sr-speedbar
+(use-package neotree
 	:ensure t
-	:bind("C-<tab>" . sr-speedbar-toggle)
-	:config(with-eval-after-load "speedbar"
-		(autoload 'sr-speedbar-toggle "sr-speedbar" nil t)
-	)
+	:diminish
+	:bind("C-<tab>" . neotree-toggle)
 )
-;; fix so speedbar is in same window
 
 (use-package magit
 	:ensure t
 	:defer t
 	:diminish
+	:commands(magit-stage-file magit-status magit-commit-create)
 	:bind(:map prog-mode-map
 		("C-c t" . magit-stage-file)
 		("C-c s" . magit-status)
@@ -85,7 +83,6 @@ initial-buffer-choice  nil
 (use-package git-gutter
 	:ensure t
 	:diminish
-	:defer t
 	:hook (prog-mode . git-gutter-mode)
 	:hook (magit-post-refresh . git-gutter:update-all-windows)
 	:bind(:map prog-mode-map
@@ -112,31 +109,13 @@ initial-buffer-choice  nil
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(use-package dashboard
-:ensure t
-:config(setq dashboard-startup-banner "~/.emacs.d/download.png")
-(setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
-(setq dashboard-items '((recents  . 3)
-                        (bookmarks . 3)
-                        (projects . 5)
-                        (agenda . 0)
-                        (registers . 0)))
-(dashboard-setup-startup-hook)
-)
-
 (global-visual-line-mode)
-
-(use-package flyspell-lazy
-	:ensure t
-	:diminish
-	:defer t
-)
 
 (use-package which-key
 	:ensure t
 	:diminish
 	:config (which-key-mode)
-)
+	)
 
 (use-package ispell
 	:no-require t
@@ -156,12 +135,11 @@ initial-buffer-choice  nil
 	:bind("C-M-s" . helm-ag)
 )
 
-(use-package anzu
-	:diminish
-	:ensure t
-	:bind
-	("M-r" . anzu-query-replace-at-cursor)
-)
+;; (defun youtube-to-mp3 (song-url)
+;; 	"Downloads a song off youtube in mp3 format"
+;; 	(interactive "sSong url: ")
+;; 	(shell-command (format "youtube-dl -x --audio-format mp3 %s" song-url))
+;; )
 
 (global-unset-key "\C-z")
 (global-unset-key "\C-x\C-z")
@@ -179,6 +157,11 @@ initial-buffer-choice  nil
 	(org-latex-toc-command "\\tableofcontents \\clearpage")
 )
 
+(use-package ox-twbs
+	:ensure t
+	:defer t
+)
+
 (use-package company
 	:ensure t
 	:diminish
@@ -192,27 +175,14 @@ initial-buffer-choice  nil
 	:after company
 )
 
-(use-package company-irony
+(use-package company-jedi
 	:ensure t
 	:diminish
 	:after company
 )
 
-(use-package irony
-	:ensure t
-	:diminish
-	:hook(c-mode . irony-mode)
-	:custom(w32-pipe-read-delay 50)
-)
-
 (use-package python
 	:mode("\\.py\\'" . python-mode)
-)
-
-(use-package virtualenvwrapper
-	:ensure t
-	:hook (python-mode . venv-initialize-interactive-shells)
-	:hook (python-mode . venv-initialize-eshell)
 )
 
 (use-package flycheck
@@ -255,17 +225,9 @@ initial-buffer-choice  nil
 )
 
 (use-package jdee
-	:diminish
-	:mode("\\.java\\'" . jdee-mode)
-	:bind
-	(:map jdee-mode-map
-		("<f1>" . jdee-debug)
-		("<f2>" . jdee-debug-set-breakpoint)
-		("<f3>" . jdee-debug-step-into)
-		("<f4>" . jdee-debug-cont)
-		("<f6>" . jdee-maven-build)
-	)
-	:custom(jdee-server-dir "~/.emacs.d/jdee-jar")
+	:ensure t
+	:defer t
+	:custom(jdee-server-dir "~/.emacs.d/jdee-jar/")
 )
 
 (use-package web-mode
@@ -290,6 +252,7 @@ initial-buffer-choice  nil
 
 (use-package css-comb
 	:ensure t
+	:after css-mode
 	:commands (css-comb)
 )
 
@@ -303,6 +266,7 @@ initial-buffer-choice  nil
 
 (use-package impatient-mode
 	:ensure t
+	:after web-mode
 	:hook((web-mode css-mode) . impatient-mode)
 )
 
@@ -423,6 +387,9 @@ initial-buffer-choice  nil
 (use-package speedbar :defer t)
 (use-package gud :defer t)
 (use-package all-the-icons :defer t)
+(use-package latex-extra :defer t)
+(use-package realgud :defer t)
+(use-package smartscan :defer t)
 
 (setq gc-cons-threshold 16777216
       gc-cons-percentage 0.1)

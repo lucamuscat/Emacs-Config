@@ -1,1 +1,1 @@
-./config.org
+./config_ivy.org

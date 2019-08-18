@@ -44,11 +44,31 @@ initial-buffer-choice  nil
 (setq display-time-format "%d %B %Y - %H:%M")
 (display-time-mode 1)
 
-(use-package powerline
-	:ensure t
-	:diminish
-	:init (powerline-center-theme)
+(use-package dashboard
+:ensure t
+:config(setq dashboard-startup-banner "~/.emacs.d/download.png")
+(setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
+(setq dashboard-items '((recents  . 3)
+                        (bookmarks . 3)
+                        (projects . 5)
+                        (agenda . 0)
+                        (registers . 0)))
+(dashboard-setup-startup-hook)
 )
+
+(use-package beacon
+	:ensure t
+	:config
+		(beacon-mode 1)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (use-package powerline			 ;;
+;; 	:ensure t				 ;;
+;; 	:diminish				 ;;
+;; 	:init (powerline-center-theme)		 ;;
+;; )						 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq-default
 frame-title-format '("Lucinda?"))
@@ -58,12 +78,11 @@ frame-title-format '("Lucinda?"))
 (use-package neotree
 	:ensure t
 	:diminish
-	:bind("C-<tab>" . neotree-toggle)
+	:bind*("C-<tab>" . neotree-toggle)
 )
 
 (use-package magit
 	:ensure t
-	:defer t
 	:diminish
 	:commands(magit-stage-file magit-status magit-commit-create)
 	:bind(:map prog-mode-map
@@ -157,25 +176,32 @@ frame-title-format '("Lucinda?"))
 	(org-latex-toc-command "\\tableofcontents \\clearpage")
 )
 
+
+
+(use-package helm-org-rifle
+	:ensure t
+	:bind(:map org-mode-map
+	("M-s" . helm-org-rifle-org-directory)
+)
+)
+
 (use-package ox-twbs
 	:ensure t
 	:defer t
 )
 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)))
+
 (use-package company
 	:ensure t
 	:diminish
 	:hook((web-mode css-mode c-mode) . company-mode)
-	:custom(comany-idle-delay 0.3)
+	:custom(comany-idle-delay 0.1)
 )
 
 (use-package company-web
-	:ensure t
-	:diminish
-	:after company
-)
-
-(use-package company-jedi
 	:ensure t
 	:diminish
 	:after company
@@ -185,20 +211,11 @@ frame-title-format '("Lucinda?"))
 	:mode("\\.py\\'" . python-mode)
 )
 
-(use-package flycheck
-	:ensure t
-	:commands (flycheck-mode
-	  flycheck-next-error
-	  flycheck-previous-error)
-	:diminish
-	:hook(python-mode . flycheck-mode)
-)
+(use-package elpy
+  :ensure t
+  :commands(elpy-shell-send-region-or-buffer elpy-shell-send-statement-and-step elpy-shell-switch-to-shell elpy-doc)
+  :hook(python-mode . elpy-enable)
 
-(use-package smart-compile
-	:ensure t
-	:bind(:map python-mode-map
-		("C-c C-c" . smart-compile)
-	)
 )
 
 (use-package blacken
@@ -211,11 +228,6 @@ frame-title-format '("Lucinda?"))
 	:ensure t
 	:diminish
 	:defer t
-)
-
-(use-package jedi
-	:ensure t
-	:hook(python-mode . jedi:setup)
 )
 
 (defun create-java-project (project-name group-id)
@@ -390,6 +402,7 @@ frame-title-format '("Lucinda?"))
 (use-package latex-extra :defer t)
 (use-package realgud :defer t)
 (use-package smartscan :defer t)
+(use-package ivy :defer t)
 
 (setq gc-cons-threshold 16777216
       gc-cons-percentage 0.1)

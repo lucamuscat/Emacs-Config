@@ -147,6 +147,10 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 )
 #+END_SRC
 * Functionality
+** Delete Selection
+#+BEGIN_SRC emacs-lisp
+(delete-selection-mode 1)
+#+END_SRC
 ** Magit
 
 #+BEGIN_SRC emacs-lisp
@@ -183,10 +187,6 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 I will be using ivy as a replacement for helm.
 
 #+BEGIN_SRC emacs-lisp
-(use-package flx
-	:ensure t
-	:diminish
-)
 
 (use-package flycheck-posframe
   :ensure t
@@ -221,7 +221,7 @@ I will be using ivy as a replacement for helm.
 	:config(counsel-mode)
 	:diminish
 	:bind*
-	("C-x C-b" . counsel-buffer-or-recentf)
+	("C-x C-b" . counsel-switch-buffer)
 	("M-x" . counsel-M-x)
 	("C-f" . counsel-find-file)
 	("C-M-s" . counsel-ag)
@@ -350,6 +350,15 @@ This is a god send for beginners and novices alike. In short, this allows the us
 )
 #+END_SRC
 
+** AHK
+#+BEGIN_SRC emacs-lisp
+(use-package ahk-mode
+	:hook(ahk-mode)
+	:bind(:map ahk-mode-map
+	("<tab>" . ahk-indent-line)
+	("C-c >" . ahk-indent-region)
+))
+#+END_SRC
 ** Python Mode
 #+BEGIN_SRC emacs-lisp
 (use-package python

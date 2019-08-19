@@ -81,6 +81,8 @@ frame-title-format '("Lucinda?"))
 	:bind*("C-<tab>" . neotree-toggle)
 )
 
+(delete-selection-mode 1)
+
 (use-package magit
 	:ensure t
 	:diminish
@@ -115,6 +117,11 @@ frame-title-format '("Lucinda?"))
 	:diminish
 )
 
+(use-package flycheck-posframe
+  :ensure t
+  :after flycheck
+  :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
+
 (use-package ivy
 	:ensure t
 	:diminish
@@ -143,7 +150,7 @@ frame-title-format '("Lucinda?"))
 	:config(counsel-mode)
 	:diminish
 	:bind*
-	("C-x C-b" . counsel-buffer-or-recentf)
+	("C-x C-b" . counsel-switch-buffer)
 	("M-x" . counsel-M-x)
 	("C-f" . counsel-find-file)
 	("C-M-s" . counsel-ag)

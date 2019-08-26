@@ -191,10 +191,12 @@ I will be using ivy as a replacement for helm.
 (use-package flycheck-posframe
   :ensure t
   :after flycheck
+  :defer t
   :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
 
 (use-package ivy
 	:ensure t
+	:defer 1
 	:diminish
 	:bind*
 	("C-k" . ivy-kill-line)
@@ -388,7 +390,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 (defun create-java-project (project-name group-id)
 	"Creates a java project with the necessary directory structure"
 	(interactive "sProject Name:\nsGroup ID:")
-	(shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
+	(shell-command (format "mvn archetype:generate -D groupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
 )
 
 (use-package jdee
@@ -459,7 +461,7 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
 	:ensure t
-	:hook(prog-mode . yas-global-mode)
+	:hook((prog-mode org-mode) . yas-minor-mode)
 	:bind*("C-~" . yas-insert-snippet)
 	:config
 	(yas-reload-all)
@@ -581,6 +583,9 @@ As the header states, this will call the =delete-trailing-whitespace= function w
 (use-package latex-extra :defer t)
 (use-package realgud :defer t)
 (use-package smartscan :defer t)
+(use-package helm :defer t)
+(use-package helm-ag :defer t)
+(use-package smex :defer t)
 #+END_SRC
 * Post initialization
 Lowering the GC thresholds back to a sane level.

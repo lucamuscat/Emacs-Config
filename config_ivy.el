@@ -112,18 +112,15 @@ frame-title-format '("Lucinda?"))
 )
 )
 
-(use-package flx
-	:ensure t
-	:diminish
-)
-
 (use-package flycheck-posframe
   :ensure t
   :after flycheck
+  :defer t
   :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
 
 (use-package ivy
 	:ensure t
+	:defer 1
 	:diminish
 	:bind*
 	("C-k" . ivy-kill-line)
@@ -234,6 +231,13 @@ frame-title-format '("Lucinda?"))
 	:after company
 )
 
+(use-package ahk-mode
+	:hook(ahk-mode)
+	:bind(:map ahk-mode-map
+	("<tab>" . ahk-indent-line)
+	("C-c >" . ahk-indent-region)
+))
+
 (use-package python
 	:mode("\\.py\\'" . python-mode)
 )
@@ -259,7 +263,7 @@ frame-title-format '("Lucinda?"))
 (defun create-java-project (project-name group-id)
 	"Creates a java project with the necessary directory structure"
 	(interactive "sProject Name:\nsGroup ID:")
-	(shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
+	(shell-command (format "mvn archetype:generate -D groupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
 )
 
 (use-package jdee
@@ -323,7 +327,7 @@ frame-title-format '("Lucinda?"))
 
 (use-package yasnippet
 	:ensure t
-	:hook(prog-mode . yas-global-mode)
+	:hook((prog-mode org-mode) . yas-minor-mode)
 	:bind*("C-~" . yas-insert-snippet)
 	:config
 	(yas-reload-all)
@@ -410,6 +414,9 @@ frame-title-format '("Lucinda?"))
 (use-package latex-extra :defer t)
 (use-package realgud :defer t)
 (use-package smartscan :defer t)
+(use-package helm :defer t)
+(use-package helm-ag :defer t)
+(use-package smex :defer t)
 
 (setq gc-cons-threshold 16777216
       gc-cons-percentage 0.1)

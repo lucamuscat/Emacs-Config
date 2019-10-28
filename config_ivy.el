@@ -112,48 +112,31 @@ frame-title-format '("Lucinda?"))
 )
 )
 
-(use-package flycheck-posframe
-  :ensure t
-  :after flycheck
-  :defer t
-  :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
+(setq dired-omit-files "^\\.[^.]\\|\\.pdf$\\|\\.aux$|\\.dvi$\\|\\.toc$\\|\\.out$\\")
 
 (use-package ivy
-	:ensure t
-	:defer 1
-	:diminish
-	:bind*
-	("C-k" . ivy-kill-line)
-)
+	 :ensure t
+	 :defer 1
+	 :diminish
+	 :bind*
+	 ("C-k" . ivy-kill-line)
+ )
 
-(use-package ivy-posframe
-	:after ivy
-	:ensure t
-	:diminish
-	:config(ivy-posframe-mode)
-	:custom(ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
-)
-
-(use-package swiper
-	:ensure t
-	:diminish
-	:bind*("C-s" . swiper)
-)
-
-(use-package counsel
-	:after ivy
-	:defer 1
-	:ensure t
-	:config(counsel-mode)
-	:diminish
-	:bind*
-	("C-x C-b" . counsel-switch-buffer)
-	("M-x" . counsel-M-x)
-	("C-f" . counsel-find-file)
-	("C-M-s" . counsel-ag)
-	("C-x r m" . counsel-bookmark)
-	("M-y" . counsel-yank-pop)
-)
+ (use-package counsel
+	 :after ivy
+	 :defer 1
+	 :ensure t
+	 :config(counsel-mode)
+	 :diminish
+	 :bind*
+	 ("C-x C-b" . counsel-switch-buffer)
+	     ("C-x b" . counsel-projectile-switch-to-buffer)
+	 ("M-x" . counsel-M-x)
+	 ("C-f" . counsel-find-file)
+	 ("C-M-s" . counsel-ag)
+	 ("C-x r m" . counsel-bookmark)
+	 ("M-y" . counsel-yank-pop)
+ )
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
@@ -187,6 +170,10 @@ frame-title-format '("Lucinda?"))
 	:bind (:map org-mode-map("C-<return>" . ispell-word))
 )
 
+(use-package flyspell
+:hook(flyspell-mode . org-mode)
+)
+
 (use-package define-word
 	:diminish
 	:ensure t
@@ -206,7 +193,13 @@ frame-title-format '("Lucinda?"))
 	(org-latex-images-centered t)
 	(org-latex-pdf-process
 		'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-	(org-latex-toc-command "\\tableofcontents \\clearpage")
+	(org-latex-toc-command "\\maketitle \\clearpage \\tableofcontents \\clearpage")
+)
+
+(use-package ox-latex
+	:no-require t
+	:config(add-to-list 'org-latex-packages-alist '("" "minted"))
+	:custom(org-latex-listings 'minted)
 )
 
 (use-package ox-twbs
@@ -216,7 +209,10 @@ frame-title-format '("Lucinda?"))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((python . t)))
+ '((python . t)
+))
+(org-babel-do-load-languages
+ 'org-babel-load-languages '((C . t)))
 
 (use-package company
 	:ensure t
@@ -238,6 +234,42 @@ frame-title-format '("Lucinda?"))
 	("C-c >" . ahk-indent-region)
 ))
 
+(use-package eglot
+	:ensure t
+	:commands(eglot)
+	:defer t
+)
+
+(use-package flycheck
+	:ensure t
+	:hook(c-mode . flycheck-mode)
+)
+
+(use-package cmake-mode
+	:ensure t
+	:commands(cmake-mode)
+)
+
+(use-package cmake-font-lock
+	:ensure t
+	:hook(cmake-font-lock-activate . cmake-mode)
+)
+
+
+(use-package cc-mode
+	:no-require t
+	:custom(tab-width 4)
+	:bind*(:map c-mode-map
+	("C-c C-c" . smart-compile)
+)
+)
+
+(defun luca:cmake-build ()
+	"Runs a cmake command"
+	(interactive)
+	(shell-command ("build"))
+)
+
 (use-package python
 	:mode("\\.py\\'" . python-mode)
 )
@@ -246,6 +278,11 @@ frame-title-format '("Lucinda?"))
   :ensure t
   :commands(elpy-shell-send-region-or-buffer elpy-shell-send-statement-and-step elpy-shell-switch-to-shell elpy-doc)
   :hook(python-mode . elpy-enable)
+  :bind(:map python-mode-map
+  	("C-c k" . elpy-shell-kill)
+	("C-<up>" . backward-paragraph)
+	("C-<down>" . forward-paragraph)
+	)
 )
 
 (use-package blacken
@@ -347,7 +384,11 @@ frame-title-format '("Lucinda?"))
 	:ensure t
 	:diminish
 	:bind (:map prog-mode-map
-	("C-c C-c" . smart-compile))
+	("C-c C-c" . smart-compile)
+	:map c-mode-map
+	("C-c C-c" . smart-compile)
+
+)
 )
 
 (use-package so-long
@@ -370,6 +411,7 @@ frame-title-format '("Lucinda?"))
 	:bind
 	("C->" . mc/mark-next-like-this)
 	("C-<" . mc/mark-previous-like-this)
+	("C-M-z" . mc/mark-all-words-like-this)
 )
 
 (use-package ace-mc
@@ -400,9 +442,9 @@ frame-title-format '("Lucinda?"))
 
 (use-package isearch
 	:no-require t
-	:bind
-	("M-s" . isearch-forward)
-	("M-r" . isearch-backward)
+	:bind*
+	("C-s" . isearch-forward)
+	("C-r" . isearch-backward)
 )
 
 (use-package tramp :defer t)

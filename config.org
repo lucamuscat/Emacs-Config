@@ -277,14 +277,11 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	(org-latex-toc-command "\\tableofcontents \\clearpage")
 )
 
-
-
 (use-package helm-org-rifle
 	:ensure t
 	:bind(:map org-mode-map
 	("M-s" . helm-org-rifle-org-directory)
-)
-)
+))
 
 (use-package ox-twbs
 	:ensure t
@@ -341,6 +338,12 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:diminish
 	:defer t
 )
+#+END_SRC
+** C
+#+BEGIN_SRC emacs-lisp
+    (setq-default c-basic-offset 4
+                  tab-width 4
+                  indent-tabs-mode t)
 #+END_SRC
 ** Java Mode
 #+BEGIN_SRC emacs-lisp

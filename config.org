@@ -372,6 +372,13 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:defer t
 )
 #+END_SRC
+** C Mode
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck
+	:ensure t
+	:hook(c . flycheck-mode)
+)
+#+END_SRC
 ** Java Mode
 #+BEGIN_SRC emacs-lisp
 (defun create-java-project (project-name group-id)

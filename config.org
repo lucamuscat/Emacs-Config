@@ -44,6 +44,10 @@ By default, the scratch buffer has a =prog-mode= major mode, this means that any
   :ensure t
   :init(benchmark-init/activate))
 #+END_SRC
+** Delete Selection when typing
+#+BEGIN_SRC emacs-lisp
+(delete-selection-mode 1)
+#+END_SRC
 * Theme
 #+BEGIN_SRC emacs-lisp
 

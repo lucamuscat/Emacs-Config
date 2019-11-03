@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: Luca Muscat
+# name: use-package-defer
+# key: defer
+# --
+
+(use-package $1 :defer t)

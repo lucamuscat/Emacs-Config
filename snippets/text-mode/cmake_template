@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# contributor:
+# name: cmake_template
+# key:init
+# --
+cmake_minimum_required(VERSION 3.10)
+project(dog)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall)
+
+set(SOURCE_FILES1 main.c)
+add_executable(app1 ${SOURCE_FILES1})

@@ -273,20 +273,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
   ;; )
 
 #+END_SRC
-** Feeble modeline
-#+BEGIN_SRC emacs-lisp
-(use-package    feebleline
-  :ensure       t
-  :config       (setq feebleline-msg-functions
-                      '((feebleline-line-number         :post "" :fmt "%5s")
-                        (feebleline-column-number       :pre ":" :fmt "%-2s")
-                        (feebleline-file-directory      :face feebleline-dir-face :post "")
-                        (feebleline-file-or-buffer-name :face font-lock-keyword-face :post "")
-                        (feebleline-file-modified-star  :face font-lock-warning-face :post "")
-                        (feebleline-git-branch          :face feebleline-git-face :pre " : ")
-                        (feebleline-project-name        :align right)))
-                (feebleline-mode 1))
-#+END_SRC
+** Smart operators
 ** Unbind certain keys
 #+BEGIN_SRC emacs-lisp
 (global-unset-key "\C-z")
@@ -602,6 +589,7 @@ As the header states, this will call the =delete-trailing-whitespace= function w
 (use-package realgud :defer t)
 (use-package smartscan :defer t)
 (use-package ivy :defer t)
+(use-package vterm :defer t)
 #+END_SRC
 * Post initialization
 Lowering the GC thresholds back to a sane level.

@@ -22,6 +22,8 @@
   :ensure t
   :init(benchmark-init/activate))
 
+(delete-selection-mode 1)
+
 (use-package doom-themes
 	:diminish
 	:ensure t
@@ -79,6 +81,16 @@ frame-title-format '("Lucinda?"))
 	:ensure t
 	:diminish
 	:bind*("C-<tab>" . neotree-toggle)
+)
+
+(use-package projectile
+	:ensure t
+	:init(projectile-mode)
+	(require 'cc-mode)
+	:bind("C-x r p" . projectile-switch-project)
+		 ("C-x C-M-f" . projectile-find-file)
+	:bind(:map c-mode-base-map
+		("<f1>" . projectile-compile-project))
 )
 
 (use-package magit
@@ -228,6 +240,11 @@ frame-title-format '("Lucinda?"))
 	:ensure t
 	:diminish
 	:defer t
+)
+
+(use-package flycheck
+	:ensure t
+	:hook(c . flycheck-mode)
 )
 
 (defun create-java-project (project-name group-id)

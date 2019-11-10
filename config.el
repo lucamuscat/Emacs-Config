@@ -180,8 +180,6 @@ frame-title-format '("Lucinda?"))
 	:mode("\\.org\\'" . org-mode)
 	:custom
 	(org-startup-with-inline-images nil)
-	(org-latex-image-default-width "8cm")
-	(org-latex-image-default-height "8cm")
 	(org-latex-images-centered t)
 	(org-latex-pdf-process
 		'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
@@ -223,12 +221,10 @@ frame-title-format '("Lucinda?"))
 	:mode("\\.py\\'" . python-mode)
 )
 
-(use-package elpy
-  :ensure t
-  :commands(elpy-shell-send-region-or-buffer elpy-shell-send-statement-and-step elpy-shell-switch-to-shell elpy-doc)
-  :hook(python-mode . elpy-enable)
+(defun my/python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
 
-)
+(add-hook 'python-mode-hook 'my/python-mode-hook)
 
 (use-package blacken
 	:ensure t
@@ -420,6 +416,7 @@ frame-title-format '("Lucinda?"))
 (use-package realgud :defer t)
 (use-package smartscan :defer t)
 (use-package ivy :defer t)
+(use-package vterm :defer t)
 
 (setq gc-cons-threshold 16777216
       gc-cons-percentage 0.1)

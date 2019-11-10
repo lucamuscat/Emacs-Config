@@ -162,6 +162,12 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 	:bind(:map c-mode-base-map
 		("<f1>" . projectile-compile-project))
 )
+
+(use-package helm-projectile
+	:ensure t
+	:after projectile
+	:init(helm-projectile-on)
+)
 #+END_SRC
 ** Magit
 #+BEGIN_SRC emacs-lisp
@@ -286,8 +292,6 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:mode("\\.org\\'" . org-mode)
 	:custom
 	(org-startup-with-inline-images nil)
-	(org-latex-image-default-width "8cm")
-	(org-latex-image-default-height "8cm")
 	(org-latex-images-centered t)
 	(org-latex-pdf-process
 		'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
@@ -340,12 +344,10 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:mode("\\.py\\'" . python-mode)
 )
 
-(use-package elpy
-  :ensure t
-  :commands(elpy-shell-send-region-or-buffer elpy-shell-send-statement-and-step elpy-shell-switch-to-shell elpy-doc)
-  :hook(python-mode . elpy-enable)
+(defun my/python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
 
-)
+(add-hook 'python-mode-hook 'my/python-mode-hook)
 
 (use-package blacken
 	:ensure t

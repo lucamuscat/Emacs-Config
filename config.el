@@ -238,9 +238,21 @@ frame-title-format '("Lucinda?"))
 	:defer t
 )
 
+(setq c-basic-offset 4)
+
+
 (use-package flycheck
 	:ensure t
-	:hook(c . flycheck-mode)
+	:hook(c-mode-common . flycheck-mode)
+)
+
+(use-package function-args
+	:ensure t
+	:init(fa-config-default)
+	:bind(:map c-mode-base-map
+		("M-s" . moo-jump-directory)
+)
+)
 
 (defun luca/c-debug (directory)
 	"Sets up debugging environment for c"

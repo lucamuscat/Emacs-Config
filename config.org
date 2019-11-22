@@ -297,11 +297,22 @@ This is a god send for beginners and novices alike. In short, this allows the us
 #+BEGIN_SRC emacs-lisp
 (use-package org
 	:mode("\\.org\\'" . org-mode)
+	:bind(:map org-mode-map
+		("<f1>" . org-export-dispatch)
+	)
 	:custom
 	(org-startup-with-inline-images nil)
-	(org-latex-images-centered t)
+	(org-latex-listings 'minted)
+	(org-latex-packages-alist '(("" "minted")))
+	(org-latex-minted-options
+		'(
+			("frame" "lines")
+			("linenos" "")
+		))
 	(org-latex-pdf-process
-		'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+	'("pdflatex -shell-escape -interaction=nonstopmode %f"
+	"pdflatex -shell-escape -interaction=nonstopmode %f"
+	))
 	(org-latex-toc-command "\\tableofcontents \\clearpage")
 )
 

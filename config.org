@@ -317,6 +317,11 @@ This is a god send for beginners and novices alike. In short, this allows the us
 )
 
 
+;; Call load ox-latex only when exporting.
+(use-package ox-latex
+	:no-require t
+	:commands org-export-dispatch
+)
 
 (use-package helm-org-rifle
 	:ensure t

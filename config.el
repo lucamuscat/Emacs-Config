@@ -241,6 +241,24 @@ frame-title-format '("Lucinda?"))
 (use-package flycheck
 	:ensure t
 	:hook(c . flycheck-mode)
+
+(defun luca/c-debug (directory)
+	"Sets up debugging environment for c"
+	(interactive "sFile Path:")
+	(gdb (format "gdb -i=mi %s" directory ))
+	(gbd-many-windows)
+)
+
+
+
+(use-package gud
+	:no-require t
+	:commands luca/c-debug
+	:bind(:map c-mode-base-map
+		("<f5>" . gud-break)
+		("<f6>" . gub-step)
+		("<f7>" . gud-gud-cont)
+)
 )
 
 (defun create-java-project (project-name group-id)

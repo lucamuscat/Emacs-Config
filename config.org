@@ -159,8 +159,10 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 	(require 'cc-mode)
 	:bind("C-x r p" . projectile-switch-project)
 		 ("C-x C-M-f" . projectile-find-file)
+		 ("C-x C-M-s" . projectile-save-project-buffers)
 	:bind(:map c-mode-base-map
 		("<f1>" . projectile-compile-project))
+		("<f2>" . luca/c-debug)
 )
 
 (use-package helm-projectile
@@ -248,7 +250,6 @@ This is a god send for beginners and novices alike. In short, this allows the us
 (use-package ispell
 	:no-require t
 	:defer t
-	:defer
 	:bind (:map org-mode-map("C-<return>" . ispell-word))
 	:bind (:map latex-mode-map("C-<return>" . ispell-word))
 )
@@ -317,7 +318,6 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	))
 	(org-latex-toc-command "\\tableofcontents \\clearpage")
 )
-
 
 ;; Call load ox-latex only when exporting.
 (use-package ox-latex
@@ -402,7 +402,34 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:ensure t
 	:hook(c-mode-common . flycheck-mode)
 )
+
+(use-package function-args
+	:ensure t
+	:init(fa-config-default)
+	:bind(:map c-mode-base-map
+		("M-s" . moo-jump-directory)
 )
+)
+
+(defun luca/c-debug (directory)
+	"Sets up debugging environment for c"
+	(interactive "sFile Path:")
+	(gdb (format "gdb -i=mi %s" directory ))
+	(gbd-many-windows)
+)
+
+
+
+(use-package gud
+	:no-require t
+	:commands luca/c-debug
+	:bind(:map c-mode-base-map
+		("<f5>" . gud-break)
+		("<f6>" . gub-step)
+		("<f7>" . gud-gud-cont)
+)
+)
+
 #+END_SRC
 ** Java Mode
 #+BEGIN_SRC emacs-lisp
@@ -480,7 +507,8 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
 	:ensure t
-	:hook(prog-mode . yas-global-mode)
+	:hook(prog-mode . yas-minor-mode)
+	(org-mode . yas-minor-mode)
 	:bind*("C-~" . yas-insert-snippet)
 	:config
 	(yas-reload-all)
@@ -522,7 +550,7 @@ This helps mitigate the slowness which comes with opening large files in emacs.
 	:ensure t
 	:diminish
 	:commands ace-window
-	:bind("M-o" . ace-window)
+	:bind*("M-o" . ace-window)
 )
 #+END_SRC
 ** Multi Cursors
@@ -614,6 +642,13 @@ As the header states, this will call the =delete-trailing-whitespace= function w
 
 (global-set-key (kbd "C-|") 'comment-box)
 (global-set-key (kbd "C-M-|") 'uncomment-region)
+#+END_SRC
+** Folding
+#+BEGIN_SRC emacs-lisp
+(use-package senator
+	:no-require t
+	:bind*("<f12>" . senator-fold-tag-toggle)
+)
 #+END_SRC
 * Defers
 #+BEGIN_SRC emacs-lisp

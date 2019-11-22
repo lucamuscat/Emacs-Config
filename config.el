@@ -89,8 +89,16 @@ frame-title-format '("Lucinda?"))
 	(require 'cc-mode)
 	:bind("C-x r p" . projectile-switch-project)
 		 ("C-x C-M-f" . projectile-find-file)
+		 ("C-x C-M-s" . projectile-save-project-buffers)
 	:bind(:map c-mode-base-map
 		("<f1>" . projectile-compile-project))
+		("<f2>" . luca/c-debug)
+)
+
+(use-package helm-projectile
+	:ensure t
+	:after projectile
+	:init(helm-projectile-on)
 )
 
 (use-package magit
@@ -150,8 +158,9 @@ frame-title-format '("Lucinda?"))
 
 (use-package ispell
 	:no-require t
-	:defer t
+	:defer
 	:bind (:map org-mode-map("C-<return>" . ispell-word))
+	:bind (:map latex-mode-map("C-<return>" . ispell-word))
 )
 
 (use-package define-word
@@ -176,13 +185,20 @@ frame-title-format '("Lucinda?"))
 (global-unset-key "\C-x\C-z")
 (global-unset-key "\C-x\C-c")
 
+(use-package fill
+	:no-require t
+	:bind("<f9>" . fill-region )
+)
+
 (use-package org
 	:mode("\\.org\\'" . org-mode)
 	:custom
 	(org-startup-with-inline-images nil)
-	(org-latex-images-centered t)
+	(org-latex-listings 'minted)
 	(org-latex-pdf-process
-		'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+	'("pdflatex -shell-escape -interaction=nonstopmode %f"
+	"pdflatex -shell-escape -interaction=nonstopmode %f"
+	))
 	(org-latex-toc-command "\\tableofcontents \\clearpage")
 )
 
@@ -215,6 +231,15 @@ frame-title-format '("Lucinda?"))
 	:ensure t
 	:diminish
 	:after company
+)
+
+(use-package latex
+	:no-require t
+	:hook(latex-mode . flyspell-mode)
+)
+
+(use-package ox-lateex
+	:after latex
 )
 
 (use-package python
@@ -340,7 +365,8 @@ frame-title-format '("Lucinda?"))
 
 (use-package yasnippet
 	:ensure t
-	:hook(prog-mode . yas-global-mode)
+	:hook(prog-mode . yas-minor-mode)
+	(org-mode . yas-minor-mode)
 	:bind*("C-~" . yas-insert-snippet)
 	:config
 	(yas-reload-all)
@@ -373,7 +399,7 @@ frame-title-format '("Lucinda?"))
 	:ensure t
 	:diminish
 	:commands ace-window
-	:bind("M-o" . ace-window)
+	:bind*("M-o" . ace-window)
 )
 
 (use-package multiple-cursors

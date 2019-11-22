@@ -361,6 +361,13 @@ This is a god send for beginners and novices alike. In short, this allows the us
 )
 #+END_SRC
 
+** Latex
+#+BEGIN_SRC emacs-lisp
+(use-package latex
+	:no-require t
+	:hook(latex-mode . flyspell-mode)
+)
+#+END_SRC
 ** Python Mode
 #+BEGIN_SRC emacs-lisp
 (use-package python

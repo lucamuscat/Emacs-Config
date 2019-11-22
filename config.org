@@ -393,6 +393,9 @@ This is a god send for beginners and novices alike. In short, this allows the us
 #+END_SRC
 ** C Mode
 #+BEGIN_SRC emacs-lisp
+(setq c-basic-offset 4)
+
+
 (use-package flycheck
 	:ensure t
 	:hook(c . flycheck-mode)

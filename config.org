@@ -286,6 +286,13 @@ This is a god send for beginners and novices alike. In short, this allows the us
 (global-unset-key "\C-x\C-z")
 (global-unset-key "\C-x\C-c")
 #+END_SRC
+** Fill-region
+#+BEGIN_SRC emacs-lisp
+(use-package fill
+	:no-require t
+	:bind("<f9>" . fill-region )
+)
+#+END_SRC
 * Org Mode
 #+BEGIN_SRC emacs-lisp
 (use-package org

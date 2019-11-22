@@ -248,7 +248,9 @@ This is a god send for beginners and novices alike. In short, this allows the us
 (use-package ispell
 	:no-require t
 	:defer t
+	:defer
 	:bind (:map org-mode-map("C-<return>" . ispell-word))
+	:bind (:map latex-mode-map("C-<return>" . ispell-word))
 )
 
 #+END_SRC

@@ -406,6 +406,11 @@ frame-title-format '("Lucinda?"))
 	("M-r" . isearch-backward)
 )
 
+(use-package senator
+	:no-require t
+	:bind*("<f12>" . senator-fold-tag-toggle)
+)
+
 (use-package tramp :defer t)
 (use-package with-editor :defer t)
 (use-package org-agenda :defer t)

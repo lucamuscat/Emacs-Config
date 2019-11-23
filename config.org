@@ -48,6 +48,16 @@ By default, the scratch buffer has a =prog-mode= major mode, this means that any
 #+BEGIN_SRC emacs-lisp
 (delete-selection-mode 1)
 #+END_SRC
+** Startup optimizations
+Taken from [[https://github.com/MatthewZMD/.emacs.d#orgd87dfce][MatthewZMD]]
+*** Disable =package-enable-at-startup=
+#+BEGIN_SRC emacs-lisp
+(setq package-enable-at-startup nil)
+#+END_SRC
+*** Disable =site-run-file=
+#+BEGIN_SRC emacs-lisp
+(setq site-run-file nil)
+#+END_SRC
 * Theme
 #+BEGIN_SRC emacs-lisp
 
@@ -100,7 +110,7 @@ A clock which shows in the mode line.
 #+BEGIN_SRC emacs-lisp
 (use-package dashboard
 :ensure t
-:config(setq dashboard-startup-banner "~/.emacs.d/download.png")
+:config(setq dashboard-startup-banner "~/.emacs.d/images/KEC_Dark_BK.png")
 (setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
 (setq dashboard-items '((recents  . 3)
                         (bookmarks . 3)
@@ -151,6 +161,25 @@ This is the bar at the very bottom of the emacs window. This contains informatio
 )
 #+END_SRC
 * Functionality
+** Awesome pair
+https://github.com/manateelazycat/awesome-pair
+#+BEGIN_SRC emacs-lisp
+(use-package awesome-pair
+	:load-path("~/.emacs.d/elpa/")
+	:hook( (org-mode prog-mode) . awesome-pair-mode)
+	:bind
+	("(" . awesome-pair-open-round)
+	("(" . awesome-pair-open-round)
+	("[" . awesome-pair-open-bracket)
+	("{" . awesome-pair-open-curly)
+	("=" . awesome-pair-equal)
+	("M-\"" . awesome-pair-wrap-double-quote)
+	("M-[" . awesome-pair-wrap-bracket)
+	("M-{" . awesome-pair-wrap-curly)
+	("M-(" . awesome-pair-wrap-round)
+	("M-)" . awesome-pair-unwrap)
+)
+#+END_SRC
 ** Projectile
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
@@ -251,7 +280,6 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:no-require t
 	:defer t
 	:bind (:map org-mode-map("C-<return>" . ispell-word))
-	:bind (:map latex-mode-map("C-<return>" . ispell-word))
 )
 
 #+END_SRC
@@ -319,7 +347,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	(org-latex-toc-command "\\tableofcontents \\clearpage")
 )
 
-;; Call load ox-latex only when exporting.
+;; Call load ox-latex only when exporting
 (use-package ox-latex
 	:no-require t
 	:commands org-export-dispatch
@@ -352,7 +380,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 (use-package company
 	:ensure t
 	:diminish
-	:hook((web-mode css-mode c-mode) . company-mode)
+	:hook((web-mode css-mode c-mode-common) . company-mode)
 	:custom(comany-idle-delay 0.1)
 )
 
@@ -361,8 +389,28 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:diminish
 	:after company
 )
+
+(use-package company-lsp
+  :defer t
+  :custom (company-lsp-cache-candidates 'auto))
+
 #+END_SRC
 
+** LSP-Mode
+LSP-mode helps with managing LSP's (Language Server Protocols)
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+	:ensure t
+	:hook(c-mode-common . lsp-mode)
+)
+
+(use-package lsp-ui
+	:ensure t
+	:after lsp-mode
+	:diminish
+	:commands lsp-ui-mode
+)
+#+END_SRC
 ** Latex
 #+BEGIN_SRC emacs-lisp
 (use-package latex

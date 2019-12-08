@@ -24,6 +24,10 @@
 
 (delete-selection-mode 1)
 
+(setq package-enable-at-startup nil)
+
+(setq site-run-file nil)
+
 (use-package doom-themes
 	:diminish
 	:ensure t
@@ -48,7 +52,7 @@ initial-buffer-choice  nil
 
 (use-package dashboard
 :ensure t
-:config(setq dashboard-startup-banner "~/.emacs.d/download.png")
+:config(setq dashboard-startup-banner "~/.emacs.d/images/KEC_Dark_BK.png")
 (setq dashboard-banner-logo-title "Don't do the rain dance if you can't handle the thunder - Ken M")
 (setq dashboard-items '((recents  . 3)
                         (bookmarks . 3)
@@ -81,6 +85,22 @@ frame-title-format '("Lucinda?"))
 	:ensure t
 	:diminish
 	:bind*("C-<tab>" . neotree-toggle)
+)
+
+(use-package awesome-pair
+	:load-path("~/.emacs.d/elpa/")
+	:hook( (org-mode prog-mode) . awesome-pair-mode)
+	:bind
+	("(" . awesome-pair-open-round)
+	("(" . awesome-pair-open-round)
+	("[" . awesome-pair-open-bracket)
+	("{" . awesome-pair-open-curly)
+	("=" . awesome-pair-equal)
+	("M-\"" . awesome-pair-wrap-double-quote)
+	("M-[" . awesome-pair-wrap-bracket)
+	("M-{" . awesome-pair-wrap-curly)
+	("M-(" . awesome-pair-wrap-round)
+	("M-)" . awesome-pair-unwrap)
 )
 
 (use-package projectile
@@ -158,9 +178,8 @@ frame-title-format '("Lucinda?"))
 
 (use-package ispell
 	:no-require t
-	:defer
+	:defer t
 	:bind (:map org-mode-map("C-<return>" . ispell-word))
-	:bind (:map latex-mode-map("C-<return>" . ispell-word))
 )
 
 (use-package define-word
@@ -190,11 +209,25 @@ frame-title-format '("Lucinda?"))
 	:bind("<f9>" . fill-region )
 )
 
+(use-package terminal-here
+	:ensure t
+	:commands(terminal-here terminal-here-launch terminal-here-project-launch)
+)
+
 (use-package org
 	:mode("\\.org\\'" . org-mode)
+	:bind(:map org-mode-map
+		("<f1>" . org-export-dispatch)
+	)
 	:custom
 	(org-startup-with-inline-images nil)
 	(org-latex-listings 'minted)
+	(org-latex-packages-alist '(("" "minted")))
+	(org-latex-minted-options
+		'(
+			("frame" "lines")
+			("linenos" "")
+		))
 	(org-latex-pdf-process
 	'("pdflatex -shell-escape -interaction=nonstopmode %f"
 	"pdflatex -shell-escape -interaction=nonstopmode %f"
@@ -202,7 +235,11 @@ frame-title-format '("Lucinda?"))
 	(org-latex-toc-command "\\tableofcontents \\clearpage")
 )
 
-
+;; Call load ox-latex only when exporting
+(use-package ox-latex
+	:no-require t
+	:commands org-export-dispatch
+)
 
 (use-package helm-org-rifle
 	:ensure t
@@ -216,14 +253,26 @@ frame-title-format '("Lucinda?"))
 	:defer t
 )
 
+(use-package org-wc
+	:ensure t
+	:commands(org-wc-display)
+)
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)))
 
+(use-package dap-mode
+	:ensure  t
+	:diminish
+	:defer t
+	:commands(dap-mode)
+)
+
 (use-package company
 	:ensure t
 	:diminish
-	:hook((web-mode css-mode c-mode) . company-mode)
+	:hook((web-mode css-mode c-mode-common) . company-mode)
 	:custom(comany-idle-delay 0.1)
 )
 
@@ -233,17 +282,75 @@ frame-title-format '("Lucinda?"))
 	:after company
 )
 
+(use-package company-lsp
+  :defer t
+  :after lsp
+  :custom (company-lsp-cache-candidates 'auto)
+
+)
+
+(use-package company-quickhelp
+	:ensure t
+	:diminish
+	:hook (company-mode . company-quickhelp-mode)
+)
+
+(use-package lsp-mode
+	:ensure t
+	:diminish
+	:diminish flymake
+	:hook((c-mode-common) . lsp)
+	:bind(:map c-mode-base-map
+			("<f5>" . lsp-find-definition)
+			("<f6>" . lsp-find-references)
+			("<f7>" . lsp-find-declaration)
+)
+	:custom(lsp-prefer-flymake nil)
+)
+
+(use-package flycheck-clang-analyzer
+  :ensure t
+  :after flycheck
+  :config (flycheck-clang-analyzer-setup))
+
+(use-package lsp-ui
+	:ensure t
+	:after lsp-mode
+	:bind(:map lsp-ui-mode-map
+		("C-f" . lsp-ui-imenu)
+		([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+        ([remap xref-find-references] . lsp-ui-peek-find-references)
+	)
+	:custom
+	(lsp-ui-doc-enable t)
+	(lsp-ui-doc-header t)
+	(lsp-ui-doc-include-signature t)
+	(lsp-ui-doc-position 'top)
+	(lsp-ui-doc-border (face-foreground 'default))
+	(lsp-ui-sideline-enable nil)
+	(lsp-ui-sideline-ignore-duplicate t)
+	(lsp-ui-sideline-show-code-actions nil)
+	:diminish
+	:commands lsp-ui-mode
+)
+
 (use-package latex
 	:no-require t
 	:hook(latex-mode . flyspell-mode)
 )
 
-(use-package ox-lateex
+(use-package latex-extra
+	:ensure t
 	:after latex
 )
 
 (use-package python
 	:mode("\\.py\\'" . python-mode)
+)
+
+(use-package jedi
+	:ensure t
+	:commands(company-jedi)
 )
 
 (defun my/python-mode-hook ()
@@ -263,16 +370,16 @@ frame-title-format '("Lucinda?"))
 	:defer t
 )
 
-(setq c-basic-offset 4)
-
-
-(use-package flycheck
+(use-package virtualenvwrapper
 	:ensure t
-	:hook(c-mode-common . flycheck-mode)
+	:defer t
 )
+
+(setq c-basic-offset 4)
 
 (use-package function-args
 	:ensure t
+	:diminish
 	:init(fa-config-default)
 	:bind(:map c-mode-base-map
 		("M-s" . moo-jump-directory)
@@ -292,9 +399,9 @@ frame-title-format '("Lucinda?"))
 	:no-require t
 	:commands luca/c-debug
 	:bind(:map c-mode-base-map
-		("<f5>" . gud-break)
-		("<f6>" . gub-step)
-		("<f7>" . gud-gud-cont)
+		("C-<f5>" . gud-break)
+		("C-<f6>" . gud-step)
+		("C-<f7>" . gud-next)
 )
 )
 
@@ -365,6 +472,7 @@ frame-title-format '("Lucinda?"))
 
 (use-package yasnippet
 	:ensure t
+	:diminish
 	:hook(prog-mode . yas-minor-mode)
 	(org-mode . yas-minor-mode)
 	:bind*("C-~" . yas-insert-snippet)
@@ -372,6 +480,7 @@ frame-title-format '("Lucinda?"))
 	(yas-reload-all)
 	(use-package yasnippet-snippets
 		:ensure t
+		:after yasnippet
 	)
 )
 
@@ -464,7 +573,8 @@ frame-title-format '("Lucinda?"))
 
 (use-package senator
 	:no-require t
-	:bind*("<f12>" . senator-fold-tag-toggle)
+	:bind*("<M-down>" . senator-transpose-tags-down)
+	("<M-up>" . senator-transpose-tags-up)
 )
 
 (use-package tramp :defer t)
@@ -473,10 +583,9 @@ frame-title-format '("Lucinda?"))
 (use-package speedbar :defer t)
 (use-package gud :defer t)
 (use-package all-the-icons :defer t)
-(use-package latex-extra :defer t)
 (use-package realgud :defer t)
 (use-package smartscan :defer t)
-(use-package ivy :defer t)
+(use-package ivy :diminish :defer t)
 (use-package vterm :defer t)
 
 (setq gc-cons-threshold 16777216

@@ -130,18 +130,6 @@ Helps user find the line which they are editing when they swap buffer.
 )
 #+END_SRC
 
-*** Powerline (Mode line)
-This is the bar at the very bottom of the emacs window. This contains information relevant to the file that is currently being edited (for instance file name, minor and major modes used, current git branch and so on).
-#+BEGIN_SRC emacs-lisp
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; (use-package powerline			 ;;
-  ;; 	:ensure t				 ;;
-  ;; 	:diminish				 ;;
-  ;; 	:init (powerline-center-theme)		 ;;
-  ;; )						 ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#+END_SRC
-
 *** Customize frame name
  #+BEGIN_SRC emacs-lisp
  (setq-default
@@ -168,7 +156,6 @@ https://github.com/manateelazycat/awesome-pair
 	:load-path("~/.emacs.d/elpa/")
 	:hook( (org-mode prog-mode) . awesome-pair-mode)
 	:bind
-	("(" . awesome-pair-open-round)
 	("(" . awesome-pair-open-round)
 	("[" . awesome-pair-open-bracket)
 	("{" . awesome-pair-open-curly)
@@ -298,19 +285,10 @@ This is a god send for beginners and novices alike. In short, this allows the us
 (use-package helm-ag
 	:ensure t
 	:diminish
+	:commands(helm-ag)
 	:bind("C-M-s" . helm-ag)
 )
 #+END_SRC
-** Downloading songs off youtube
-#+BEGIN_SRC emacs-lisp
-  ;; (defun youtube-to-mp3 (song-url)
-  ;; 	"Downloads a song off youtube in mp3 format"
-  ;; 	(interactive "sSong url: ")
-  ;; 	(shell-command (format "youtube-dl -x --audio-format mp3 %s" song-url))
-  ;; )
-
-#+END_SRC
-** Smart operators
 ** Unbind certain keys
 #+BEGIN_SRC emacs-lisp
 (global-unset-key "\C-z")
@@ -322,6 +300,21 @@ This is a god send for beginners and novices alike. In short, this allows the us
 (use-package fill
 	:no-require t
 	:bind("<f9>" . fill-region )
+)
+#+END_SRC
+** Undo-tree
+#+BEGIN_SRC elisp
+(use-package undo-tree
+	:ensure t
+	:commands(undo-tree-mode)
+	:defer t
+)
+#+END_SRC
+** Terminal-here
+#+BEGIN_SRC emacs-lisp
+(use-package terminal-here
+	:ensure t
+	:commands(terminal-here terminal-here-launch terminal-here-project-launch)
 )
 #+END_SRC
 * Org Mode
@@ -365,6 +358,11 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:defer t
 )
 
+(use-package org-wc
+	:ensure t
+	:commands(org-wc-display)
+)
+
 #+END_SRC
 ** Enable python snippets
 
@@ -375,6 +373,29 @@ This is a god send for beginners and novices alike. In short, this allows the us
 #+END_SRC
 
 * Programming
+** Debugging =`DAP-mode=
+#+BEGIN_SRC emacs-lisp
+(use-package dap-mode
+	:ensure  t
+	:diminish
+	:defer t
+	:commands(dap-mode)
+)
+#+END_SRC
+** Flycheck
+#+BEGIN_SRC elisp
+; Taken from https://github.com/Bernard12/emacs.d/blob/b5297359f6c9c52bf05f565d22bba632e8c88c8e/rc/flycheck.el
+(defun luca/flycheck-hook()
+	(flycheck-mode)
+	(flycheck-select-checker 'c/c++-gcc))
+
+(use-package flycheck
+	:ensure t
+	:diminish
+	:hook(c-mode-common . flycheck-hook)
+	:commands(flycheck-mode)
+)
+#+END_SRC
 ** Company
 #+BEGIN_SRC emacs-lisp
 (use-package company
@@ -392,7 +413,16 @@ This is a god send for beginners and novices alike. In short, this allows the us
 
 (use-package company-lsp
   :defer t
-  :custom (company-lsp-cache-candidates 'auto))
+  :after lsp
+  :custom (company-lsp-cache-candidates 'auto)
+
+)
+
+(use-package company-quickhelp
+	:ensure t
+	:diminish
+	:hook (company-mode . company-quickhelp-mode)
+)
 
 #+END_SRC
 
@@ -401,12 +431,39 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
 	:ensure t
-	:hook(c-mode-common . lsp-mode)
+	:diminish
+	:diminish flymake
+	:hook((c-mode-common) . lsp)
+	:bind(:map c-mode-base-map
+			("<f5>" . lsp-find-definition)
+			("<f6>" . lsp-find-references)
+			("<f7>" . lsp-find-declaration)
 )
+	:custom(lsp-prefer-flymake nil)
+)
+
+(use-package flycheck-clang-analyzer
+  :ensure t
+  :after flycheck
+  :config (flycheck-clang-analyzer-setup))
 
 (use-package lsp-ui
 	:ensure t
 	:after lsp-mode
+	:bind(:map lsp-ui-mode-map
+		("C-f" . lsp-ui-imenu)
+		([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+        ([remap xref-find-references] . lsp-ui-peek-find-references)
+	)
+	:custom
+	(lsp-ui-doc-enable t)
+	(lsp-ui-doc-header t)
+	(lsp-ui-doc-include-signature t)
+	(lsp-ui-doc-position 'top)
+	(lsp-ui-doc-border (face-foreground 'default))
+	(lsp-ui-sideline-enable nil)
+	(lsp-ui-sideline-ignore-duplicate t)
+	(lsp-ui-sideline-show-code-actions nil)
 	:diminish
 	:commands lsp-ui-mode
 )
@@ -417,11 +474,21 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 	:no-require t
 	:hook(latex-mode . flyspell-mode)
 )
+
+(use-package latex-extra
+	:ensure t
+	:after latex
+)
 #+END_SRC
 ** Python Mode
 #+BEGIN_SRC emacs-lisp
 (use-package python
 	:mode("\\.py\\'" . python-mode)
+)
+
+(use-package jedi
+	:ensure t
+	:commands(company-jedi)
 )
 
 (defun my/python-mode-hook ()
@@ -440,23 +507,21 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 	:diminish
 	:defer t
 )
+
+(use-package virtualenvwrapper
+	:ensure t
+	:defer t
+)
+
 #+END_SRC
 ** C Mode
 #+BEGIN_SRC emacs-lisp
 (setq c-basic-offset 4)
 
-
-(use-package flycheck
-	:ensure t
-	:hook(c-mode-common . flycheck-mode)
-)
-
 (use-package function-args
 	:ensure t
-	:init(fa-config-default)
-	:bind(:map c-mode-base-map
-		("M-s" . moo-jump-directory)
-)
+	:diminish
+	:defer t
 )
 
 (defun luca/c-debug (directory)
@@ -472,29 +537,13 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 	:no-require t
 	:commands luca/c-debug
 	:bind(:map c-mode-base-map
-		("<f5>" . gud-break)
-		("<f6>" . gub-step)
-		("<f7>" . gud-gud-cont)
+		("C-<f5>" . gud-break)
+		("C-<f6>" . gud-step)
+		("C-<f7>" . gud-next)
 )
 )
 
 #+END_SRC
-** Java Mode
-#+BEGIN_SRC emacs-lisp
-(defun create-java-project (project-name group-id)
-	"Creates a java project with the necessary directory structure"
-	(interactive "sProject Name:\nsGroup ID:")
-	(shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
-)
-
-(use-package jdee
-	:ensure t
-	:defer t
-	:custom(jdee-server-dir "~/.emacs.d/jdee-jar/")
-)
-
-#+END_SRC
-
 ** HTML
 #+BEGIN_SRC emacs-lisp
 (use-package web-mode
@@ -519,7 +568,6 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 
 (use-package css-comb
 	:ensure t
-	:after css-mode
 	:commands (css-comb)
 )
 
@@ -554,7 +602,8 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 To create snippets, just write it out on any buffer and leave a '~' right behind the placeholder. Then highlight the region and use the command =aya-create=. Use =aya-persist-snippet= to save the created snippet.
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
-	:ensure t
+:ensure t
+	:diminish
 	:hook(prog-mode . yas-minor-mode)
 	(org-mode . yas-minor-mode)
 	:bind*("C-~" . yas-insert-snippet)
@@ -562,6 +611,7 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 	(yas-reload-all)
 	(use-package yasnippet-snippets
 		:ensure t
+		:after yasnippet
 	)
 )
 
@@ -577,8 +627,7 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 (use-package smart-compile
 	:ensure t
 	:diminish
-	:bind (:map prog-mode-map
-	("C-c C-c" . smart-compile))
+	:commands(smart-compile)
 )
 #+END_SRC
 ** So-long
@@ -668,7 +717,7 @@ Smex incorporates fuzzy finding into M-x, making working in EMACS require much l
 #+END_SRC
 
 ** Delete Trailing Whitespace on Save
-As the header states, this will call the =delete-trailing-whitespace= function whenever a save occurs.
+   As the header states, this will call the =delete-trailing-whitespace= function whenever a save occurs.
 #+BEGIN_SRC emacs-lisp
 (use-package simple
 	:no-require t
@@ -695,7 +744,8 @@ As the header states, this will call the =delete-trailing-whitespace= function w
 #+BEGIN_SRC emacs-lisp
 (use-package senator
 	:no-require t
-	:bind*("<f12>" . senator-fold-tag-toggle)
+	:bind*("<M-down>" . senator-transpose-tags-down)
+	("<M-up>" . senator-transpose-tags-up)
 )
 #+END_SRC
 * Defers
@@ -706,10 +756,9 @@ As the header states, this will call the =delete-trailing-whitespace= function w
 (use-package speedbar :defer t)
 (use-package gud :defer t)
 (use-package all-the-icons :defer t)
-(use-package latex-extra :defer t)
 (use-package realgud :defer t)
 (use-package smartscan :defer t)
-(use-package ivy :defer t)
+(use-package ivy :diminish :defer t)
 (use-package vterm :defer t)
 #+END_SRC
 * Post initialization

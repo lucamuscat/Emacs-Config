@@ -4,9 +4,32 @@
 Hi there! As you might have guessed, this is my EMACS config which I use pretty often. There are some basic plugins in here which in my opinion everyone should be using. Hope that you could learn something by going through my config.
 * Installation
 ** Quick Installation
-=git clone https://github.com/lucamuscat/Emacs-Config/blob/master/config.org=
+*** Windows
+Copy the following script into your command line. Please make sure that you have git installed from before hand.
+#+BEGIN_SRC shell
+cd %appdata%
+git clone https://github.com/lucamuscat/Emacs-Config.git
+rename Emacs-Config .emacs.d
+cd .emacs.d
+rename "./.emacs" "../.emacs"
+#+END_SRC
 
-Make sure that your .emacs.d directory is empty before cloning. A significant number of packages will be downloaded after the clone is done. Contact me with any inquiries which you might have.
+Once you paste this into your cmd, do =M-x eval-expression= and run the following
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-enable-at-startup nil)
+
+;;; remove SC if you are not using sunrise commander and org if you like outdated packages
+(setq package-archives '(("ELPA"  . "http://tromey.com/elpa/")
+			 ("gnu"   . "http://elpa.gnu.org/packages/")
+			 ("melpa" . "https://melpa.org/packages/")
+			 ("elpa"  . "https://elpa.gnu.org/packages/")
+			 ))
+(package-initialize)
+#+END_SRC
+
+Then call =M-x package-install use-package=. After that, go into the .emacs.d file and run =eval-buffer=.
+
 * Initialization
 ** GC Thresholds
 Increasing =gc-cons-threshold= to a very high number to will decrease the load and compile time. This will later be lowered back down to a more sane value to prevent complications. ([[https://github.com/jwiegley/dot-emacs/blob/master/init.el][taken from J. Wiegley's init.el]])
@@ -140,12 +163,32 @@ Helps user find the line which they are editing when they swap buffer.
 #+BEGIN_SRC emacs-lisp
 (set-frame-font "Consolas 14" nil t)
 #+END_SRC
-*** Neotree
+*** Treemacs
 #+BEGIN_SRC emacs-lisp
-(use-package neotree
+(use-package treemacs
 	:ensure t
 	:diminish
-	:bind*("C-<tab>" . neotree-toggle)
+	:bind*("C-<tab>" . treemacs)
+	:custom
+	(treemacs-indentation 2)
+	(treemacs-eldoc-display t)
+	(treemacs-show-hidden-files t)
+	(treemacs-width 35)
+	(treemacs-display-in-side-window nil)
+	(treemacs-pre-file-insert-predicates)
+)
+
+(use-package treemacs-projectile
+	:ensure t
+	:diminish
+	:after treemacs projectile
+)
+
+(use-package lsp-treemacs
+	:ensure t
+	:diminish
+	:after treemacs lsp
+	:config(lsp-treemacs-sync-mode 1)
 )
 #+END_SRC
 * Functionality
@@ -170,6 +213,7 @@ https://github.com/manateelazycat/awesome-pair
 ** Projectile
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
+	:diminish
 	:ensure t
 	:init(projectile-mode)
 	(require 'cc-mode)
@@ -184,6 +228,7 @@ https://github.com/manateelazycat/awesome-pair
 (use-package helm-projectile
 	:ensure t
 	:after projectile
+	:bind("C-M-s" . helm-projectile-ag)
 	:init(helm-projectile-on)
 )
 #+END_SRC
@@ -286,7 +331,6 @@ This is a god send for beginners and novices alike. In short, this allows the us
 	:ensure t
 	:diminish
 	:commands(helm-ag)
-	:bind("C-M-s" . helm-ag)
 )
 #+END_SRC
 ** Unbind certain keys
@@ -373,6 +417,41 @@ This is a god send for beginners and novices alike. In short, this allows the us
 #+END_SRC
 
 * Programming
+** C# / .NET
+#+BEGIN_SRC emacs-lisp
+(use-package csharp-mode
+	:mode ("\\.cs\\'" . csharp-mode)
+	:ensure t
+	:hook(csharp-mode . (lambda ()
+		(dotnet-mode 1)
+		(omnisharp-mode 1)
+	))
+	:config(lambda()
+	(eval-after-load
+	'company
+	'(add-to-list 'company-backends 'company-omnisharp))
+)
+)
+
+(use-package dotnet
+	:ensure t
+	:diminish
+	:commands(dotnet-mode)
+)
+
+(use-package csproj-mode
+	:mode("\\.csproj\\'" . csproj-mode)
+	:ensure t
+	:diminish
+)
+
+(use-package omnisharp
+	:ensure t
+	:after csharp-mode
+	:commands(omnisharp-mode)
+)
+
+#+END_SRC
 ** Debugging =`DAP-mode=
 #+BEGIN_SRC emacs-lisp
 (use-package dap-mode
@@ -384,15 +463,13 @@ This is a god send for beginners and novices alike. In short, this allows the us
 #+END_SRC
 ** Flycheck
 #+BEGIN_SRC elisp
-; Taken from https://github.com/Bernard12/emacs.d/blob/b5297359f6c9c52bf05f565d22bba632e8c88c8e/rc/flycheck.el
-(defun luca/flycheck-hook()
-	(flycheck-mode)
-	(flycheck-select-checker 'c/c++-gcc))
-
 (use-package flycheck
 	:ensure t
 	:diminish
-	:hook(c-mode-common . flycheck-hook)
+	:hook(c-mode-common . (lambda ()
+	(flycheck-mode)
+	(flycheck-select-checker 'c/c++-gcc)
+))
 	:commands(flycheck-mode)
 )
 #+END_SRC
@@ -401,8 +478,8 @@ This is a god send for beginners and novices alike. In short, this allows the us
 (use-package company
 	:ensure t
 	:diminish
-	:hook((web-mode css-mode c-mode-common) . company-mode)
-	:custom(comany-idle-delay 0.1)
+	:hook((web-mode css-mode c-mode-common csharp-mode) . company-mode)
+	:custom(comany-idle-delay 0.3)
 )
 
 (use-package company-web
@@ -413,7 +490,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 
 (use-package company-lsp
   :defer t
-  :after lsp
+  :after company lsp
   :custom (company-lsp-cache-candidates 'auto)
 
 )
@@ -421,6 +498,7 @@ This is a god send for beginners and novices alike. In short, this allows the us
 (use-package company-quickhelp
 	:ensure t
 	:diminish
+	:after company
 	:hook (company-mode . company-quickhelp-mode)
 )
 
@@ -431,15 +509,14 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
 	:ensure t
-	:diminish
-	:diminish flymake
 	:hook((c-mode-common) . lsp)
 	:bind(:map c-mode-base-map
 			("<f5>" . lsp-find-definition)
 			("<f6>" . lsp-find-references)
 			("<f7>" . lsp-find-declaration)
+
 )
-	:custom(lsp-prefer-flymake nil)
+	:config(lsp-lens-mode t)
 )
 
 (use-package flycheck-clang-analyzer
@@ -457,7 +534,7 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 	)
 	:custom
 	(lsp-ui-doc-enable t)
-	(lsp-ui-doc-header t)
+	(lsp-ui-doc-header nil)
 	(lsp-ui-doc-include-signature t)
 	(lsp-ui-doc-position 'top)
 	(lsp-ui-doc-border (face-foreground 'default))
@@ -549,6 +626,7 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 (use-package web-mode
 	:ensure t
 	:mode("\\.html\\'")
+	:mode("\\.cshtml\\'")
 	:config(web-mode-toggle-current-element-highlight)
 	:bind(:map web-mode-map
 	("C-c C-e -" . web-mode-element-contract)
@@ -602,7 +680,7 @@ LSP-mode helps with managing LSP's (Language Server Protocols)
 To create snippets, just write it out on any buffer and leave a '~' right behind the placeholder. Then highlight the region and use the command =aya-create=. Use =aya-persist-snippet= to save the created snippet.
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
-:ensure t
+	:ensure t
 	:diminish
 	:hook(prog-mode . yas-minor-mode)
 	(org-mode . yas-minor-mode)
@@ -610,6 +688,10 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 	:config
 	(yas-reload-all)
 	(use-package yasnippet-snippets
+		:ensure t
+		:after yasnippet
+	)
+	(use-package yasnippet-classic-snippets
 		:ensure t
 		:after yasnippet
 	)
@@ -634,7 +716,7 @@ To create snippets, just write it out on any buffer and leave a '~' right behind
 This helps mitigate the slowness which comes with opening large files in emacs.
 #+BEGIN_SRC emacs-lisp
 (use-package so-long
-	:load-path("~/.emacs.d/elpa/")
+	:load-path("~/.emacs.d/packages/")
 	:commands global-so-long-mode
 	:init(global-so-long-mode)
 )
@@ -755,11 +837,8 @@ Smex incorporates fuzzy finding into M-x, making working in EMACS require much l
 (use-package org-agenda :defer t)
 (use-package speedbar :defer t)
 (use-package gud :defer t)
-(use-package all-the-icons :defer t)
-(use-package realgud :defer t)
 (use-package smartscan :defer t)
 (use-package ivy :diminish :defer t)
-(use-package vterm :defer t)
 #+END_SRC
 * Post initialization
 Lowering the GC thresholds back to a sane level.

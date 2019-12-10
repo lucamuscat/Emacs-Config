@@ -1,3 +1,14 @@
+(require 'package)
+(setq package-enable-at-startup nil)
+
+;;; remove SC if you are not using sunrise commander and org if you like outdated packages
+(setq package-archives '(("ELPA"  . "http://tromey.com/elpa/")
+			 ("gnu"   . "http://elpa.gnu.org/packages/")
+			 ("melpa" . "https://melpa.org/packages/")
+			 ("elpa"  . "https://elpa.gnu.org/packages/")
+			 ))
+(package-initialize)
+
 (defconst emacs-start-time (current-time))
 
 (defvar file-name-handler-alist-old file-name-handler-alist)
@@ -68,30 +79,41 @@ initial-buffer-choice  nil
 		(beacon-mode 1)
 )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (use-package powerline			 ;;
-;; 	:ensure t				 ;;
-;; 	:diminish				 ;;
-;; 	:init (powerline-center-theme)		 ;;
-;; )						 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (setq-default
 frame-title-format '("Lucinda?"))
 
 (set-frame-font "Consolas 14" nil t)
 
-(use-package neotree
+(use-package treemacs
 	:ensure t
 	:diminish
-	:bind*("C-<tab>" . neotree-toggle)
+	:bind*("C-<tab>" . treemacs)
+	:custom
+	(treemacs-indentation 2)
+	(treemacs-eldoc-display t)
+	(treemacs-show-hidden-files t)
+	(treemacs-width 35)
+	(treemacs-display-in-side-window nil)
+	(treemacs-pre-file-insert-predicates)
+)
+
+(use-package treemacs-projectile
+	:ensure t
+	:diminish
+	:after treemacs projectile
+)
+
+(use-package lsp-treemacs
+	:ensure t
+	:diminish
+	:after treemacs lsp
+	:config(lsp-treemacs-sync-mode 1)
 )
 
 (use-package awesome-pair
 	:load-path("~/.emacs.d/elpa/")
 	:hook( (org-mode prog-mode) . awesome-pair-mode)
 	:bind
-	("(" . awesome-pair-open-round)
 	("(" . awesome-pair-open-round)
 	("[" . awesome-pair-open-bracket)
 	("{" . awesome-pair-open-curly)
@@ -104,6 +126,7 @@ frame-title-format '("Lucinda?"))
 )
 
 (use-package projectile
+	:diminish
 	:ensure t
 	:init(projectile-mode)
 	(require 'cc-mode)
@@ -118,6 +141,7 @@ frame-title-format '("Lucinda?"))
 (use-package helm-projectile
 	:ensure t
 	:after projectile
+	:bind("C-M-s" . helm-projectile-ag)
 	:init(helm-projectile-on)
 )
 
@@ -191,14 +215,8 @@ frame-title-format '("Lucinda?"))
 (use-package helm-ag
 	:ensure t
 	:diminish
-	:bind("C-M-s" . helm-ag)
+	:commands(helm-ag)
 )
-
-;; (defun youtube-to-mp3 (song-url)
-;; 	"Downloads a song off youtube in mp3 format"
-;; 	(interactive "sSong url: ")
-;; 	(shell-command (format "youtube-dl -x --audio-format mp3 %s" song-url))
-;; )
 
 (global-unset-key "\C-z")
 (global-unset-key "\C-x\C-z")
@@ -262,6 +280,38 @@ frame-title-format '("Lucinda?"))
  'org-babel-load-languages
  '((python . t)))
 
+(use-package csharp-mode
+	:mode ("\\.cs\\'" . csharp-mode)
+	:ensure t
+	:hook(csharp-mode . (lambda ()
+		(dotnet-mode 1)
+		(omnisharp-mode 1)
+	))
+	:config(lambda()
+	(eval-after-load
+	'company
+	'(add-to-list 'company-backends 'company-omnisharp))
+)
+)
+
+(use-package dotnet
+	:ensure t
+	:diminish
+	:commands(dotnet-mode)
+)
+
+(use-package csproj-mode
+	:mode("\\.csproj\\'" . csproj-mode)
+	:ensure t
+	:diminish
+)
+
+(use-package omnisharp
+	:ensure t
+	:after csharp-mode
+	:commands(omnisharp-mode)
+)
+
 (use-package dap-mode
 	:ensure  t
 	:diminish
@@ -272,8 +322,8 @@ frame-title-format '("Lucinda?"))
 (use-package company
 	:ensure t
 	:diminish
-	:hook((web-mode css-mode c-mode-common) . company-mode)
-	:custom(comany-idle-delay 0.1)
+	:hook((web-mode css-mode c-mode-common csharp-mode) . company-mode)
+	:custom(comany-idle-delay 0.3)
 )
 
 (use-package company-web
@@ -297,15 +347,14 @@ frame-title-format '("Lucinda?"))
 
 (use-package lsp-mode
 	:ensure t
-	:diminish
-	:diminish flymake
 	:hook((c-mode-common) . lsp)
 	:bind(:map c-mode-base-map
 			("<f5>" . lsp-find-definition)
 			("<f6>" . lsp-find-references)
 			("<f7>" . lsp-find-declaration)
+
 )
-	:custom(lsp-prefer-flymake nil)
+	:config(lsp-lens-mode t)
 )
 
 (use-package flycheck-clang-analyzer
@@ -323,7 +372,7 @@ frame-title-format '("Lucinda?"))
 	)
 	:custom
 	(lsp-ui-doc-enable t)
-	(lsp-ui-doc-header t)
+	(lsp-ui-doc-header nil)
 	(lsp-ui-doc-include-signature t)
 	(lsp-ui-doc-position 'top)
 	(lsp-ui-doc-border (face-foreground 'default))
@@ -380,10 +429,7 @@ frame-title-format '("Lucinda?"))
 (use-package function-args
 	:ensure t
 	:diminish
-	:init(fa-config-default)
-	:bind(:map c-mode-base-map
-		("M-s" . moo-jump-directory)
-)
+	:defer t
 )
 
 (defun luca/c-debug (directory)
@@ -405,21 +451,10 @@ frame-title-format '("Lucinda?"))
 )
 )
 
-(defun create-java-project (project-name group-id)
-	"Creates a java project with the necessary directory structure"
-	(interactive "sProject Name:\nsGroup ID:")
-	(shell-command (format "mvn archetype:generate -DgroupId=%s -DartifactId=%s -DarchetypeArtifactId=maven-archetype-simple -DarchetypeVersion=1.4 -DinteractiveMode=false" group-id project-name))
-)
-
-(use-package jdee
-	:ensure t
-	:defer t
-	:custom(jdee-server-dir "~/.emacs.d/jdee-jar/")
-)
-
 (use-package web-mode
 	:ensure t
 	:mode("\\.html\\'")
+	:mode("\\.cshtml\\'")
 	:config(web-mode-toggle-current-element-highlight)
 	:bind(:map web-mode-map
 	("C-c C-e -" . web-mode-element-contract)
@@ -439,7 +474,6 @@ frame-title-format '("Lucinda?"))
 
 (use-package css-comb
 	:ensure t
-	:after css-mode
 	:commands (css-comb)
 )
 
@@ -494,12 +528,11 @@ frame-title-format '("Lucinda?"))
 (use-package smart-compile
 	:ensure t
 	:diminish
-	:bind (:map prog-mode-map
-	("C-c C-c" . smart-compile))
+	:commands(smart-compile)
 )
 
 (use-package so-long
-	:load-path("~/.emacs.d/elpa/")
+	:load-path("~/.emacs.d/packages/")
 	:commands global-so-long-mode
 	:init(global-so-long-mode)
 )
@@ -582,11 +615,8 @@ frame-title-format '("Lucinda?"))
 (use-package org-agenda :defer t)
 (use-package speedbar :defer t)
 (use-package gud :defer t)
-(use-package all-the-icons :defer t)
-(use-package realgud :defer t)
 (use-package smartscan :defer t)
 (use-package ivy :diminish :defer t)
-(use-package vterm :defer t)
 
 (setq gc-cons-threshold 16777216
       gc-cons-percentage 0.1)

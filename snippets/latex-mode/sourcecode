@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor:
+# name: sourcecode
+# key: sc
+# --
+ \sourcecode{snippets/$1}{$2}{$3}

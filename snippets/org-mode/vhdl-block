@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# contributor:
+# name: vhdl-block
+# key: vhdl
+# --
+#+BEGIN_SRC vhdl
+$1
+#+END_SRC
